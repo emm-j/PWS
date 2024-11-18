@@ -58,12 +58,12 @@ class _HomePageState extends State<HomePage> {
           kleur = Color.fromRGBO(255, 181, 0, 1);
         });
       }
-      else if (dagelijksevoortgang >= 0.61 && dagelijksevoortgang <= 0.81) {
+      else if (dagelijksevoortgang >= 0.61 && dagelijksevoortgang <= 0.91) {
         setState(() {
           kleur = Color.fromRGBO(151, 200, 130, 1);
         });
       }
-      else if (dagelijksevoortgang >= 0.81 && dagelijksevoortgang <= 1) {
+      else if (dagelijksevoortgang >= 0.91 && dagelijksevoortgang <= 1) {
         setState(() {
           kleur = Color.fromRGBO(22, 143, 28, 1);
         });
@@ -75,8 +75,10 @@ class _HomePageState extends State<HomePage> {
     Widget build(BuildContext context) {
       return Scaffold(
           floatingActionButton: FloatingActionButton(
-              onPressed: _hogeredagelijksevoortgang,
-              child: const Icon(Icons.add)
+              onPressed: () {
+                Navigator.pushNamed(context, '/instelling');
+      },
+              child: const Icon(Icons.arrow_forward)
           ),
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(80),
@@ -134,10 +136,11 @@ class _HomePageState extends State<HomePage> {
                       )
                   ),
                   Container(
+                    color: Colors.amber,
                     child: IconButton(
-                      icon: Icon(Icons.arrow_forward),
+                      icon: Icon(Icons.add),
                       onPressed: () {
-                        Navigator.pushNamed(context, '/instelling');
+                        _hogeredagelijksevoortgang();
                       }
                     )
                   )
@@ -160,6 +163,13 @@ class Instellingen extends StatefulWidget {
 }
 
 class _InstellingenState extends State<Instellingen> {
+  TextEditingController _controller = TextEditingController();
+
+  void _toonInvoer() {
+    String userInput = _controller.text;
+    int doelStappen = int.parse(userInput);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -167,16 +177,30 @@ class _InstellingenState extends State<Instellingen> {
       body: Column(
         children: <Widget>[
           Container(
-            padding: EdgeInsetsDirectional.fromSTEB(30, 50, 30, 0),
-            width: 400,
-            height: 40,
-            color: Colors.amber,
+            padding: EdgeInsetsDirectional.fromSTEB(30, 100, 30, 0),
+            height: 200,
             child: TextField(
-
+              controller: _controller,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                  labelText: 'Voer iets in',
+                  labelStyle: TextStyle(
+                    fontFamily: "Tekst",
+                    fontSize: 30,
+                  ),// Labeltekst
+                  hintText: 'Bijvoorbeeld: Naam', // Plaatshoudertekst
+                  border: OutlineInputBorder()
             ),
           )
+          )
         ]
-      )
+      ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.pushNamed(context, '/');
+          },
+          child: const Icon(Icons.arrow_back)
+      ),
     );
   }
 }
