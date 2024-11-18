@@ -169,7 +169,7 @@ class _InstellingenState extends State<Instellingen> {
           Container(
             padding: EdgeInsetsDirectional.fromSTEB(30, 50, 30, 0),
             width: 400,
-            height: 30,
+            height: 40,
             color: Colors.amber,
             child: TextField(
 
