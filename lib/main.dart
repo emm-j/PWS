@@ -138,10 +138,38 @@ class _HomePageState extends State<HomePage> {
                           )
                       )
                   ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text("0",
+                      style: TextStyle(
+                        fontFamily: "Tekst",
+                        color: Colors.grey[800],
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800
+                      )),
+                      Padding(
+                        padding: EdgeInsets.only(left: 250)
+                      ),
+                      Text("12.000",
+                          style: TextStyle(
+                              fontFamily: "Tekst",
+                              color: Colors.grey[800],
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800
+                          ))
+                    ],
+                  ),
                   Container(
-                    color: Colors.amber,
+                    height: 65,
+                    width: 65,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.amber,
+                    ),
                     child: IconButton(
-                      icon: Icon(Icons.add),
+                      icon: Icon(Icons.add,
+                      size: 30),
                       onPressed: () {
                         _hogeredagelijksevoortgang();
                       }
