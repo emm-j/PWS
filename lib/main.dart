@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 
+String weergavedoelstappen = "Nog geen waarde";
+
+
 void main() {
   runApp(const MyApp(
   ));
@@ -164,10 +167,15 @@ class Instellingen extends StatefulWidget {
 
 class _InstellingenState extends State<Instellingen> {
   TextEditingController _controller = TextEditingController();
+  late int doelstappen;
 
   void _toonInvoer() {
     String userInput = _controller.text;
-    int doelStappen = int.parse(userInput);
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Je invoer is: $userInput')));
+    setState(() {
+      weergavedoelstappen = userInput;
+    });
   }
 
   @override
@@ -177,12 +185,12 @@ class _InstellingenState extends State<Instellingen> {
       body: Column(
         children: <Widget>[
           Container(
-            padding: EdgeInsetsDirectional.fromSTEB(30, 100, 30, 0),
+            padding: const EdgeInsetsDirectional.fromSTEB(30, 100, 30, 0),
             height: 200,
             child: TextField(
               controller: _controller,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                   labelText: 'Voer iets in',
                   labelStyle: TextStyle(
                     fontFamily: "Tekst",
@@ -192,7 +200,12 @@ class _InstellingenState extends State<Instellingen> {
                   border: OutlineInputBorder()
             ),
           )
-          )
+          ),
+          IconButton(
+            onPressed: _toonInvoer,
+            icon: Icon(Icons.send)
+          ),
+          Text('$weergavedoelstappen')
         ]
       ),
       floatingActionButton: FloatingActionButton(
@@ -227,4 +240,3 @@ class DateWidget extends StatelessWidget {
 
   }
 }
-
