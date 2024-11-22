@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 
-String weergavedoelstappen = "Nog geen waarde";
-
-
 void main() {
   runApp(const MyApp(
   ));
@@ -43,6 +40,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   double dagelijksevoortgang = 0.0;
+  String weergavedoelstappen = "0";
   var kleur = Color.fromRGBO(151, 200, 130, 1);
 
   void _hogeredagelijksevoortgang() {
@@ -78,9 +76,15 @@ class _HomePageState extends State<HomePage> {
     Widget build(BuildContext context) {
       return Scaffold(
           floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/instelling');
-      },
+              onPressed: () async {
+                final result = await Navigator.pushNamed(context, '/instelling');
+                if (result != null && result is String) {
+                  setState(() {
+                    weergavedoelstappen = result;
+                  });
+                }
+              },
+
               child: const Icon(Icons.arrow_forward)
           ),
           appBar: PreferredSize(
@@ -151,7 +155,7 @@ class _HomePageState extends State<HomePage> {
                       Padding(
                         padding: EdgeInsets.only(left: 250)
                       ),
-                      Text("12.000",
+                      Text("$weergavedoelstappen",
                           style: TextStyle(
                               fontFamily: "Tekst",
                               color: Colors.grey[800],
@@ -201,9 +205,6 @@ class _InstellingenState extends State<Instellingen> {
     String userInput = _controller.text;
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Je invoer is: $userInput')));
-    setState(() {
-      weergavedoelstappen = userInput;
-    });
   }
 
   @override
@@ -233,12 +234,11 @@ class _InstellingenState extends State<Instellingen> {
             onPressed: _toonInvoer,
             icon: Icon(Icons.send)
           ),
-          Text('$weergavedoelstappen')
         ]
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.pushNamed(context, '/');
+            Navigator.pop(context, _controller.text);
           },
           child: const Icon(Icons.arrow_back)
       ),
