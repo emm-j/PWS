@@ -43,14 +43,57 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int waardedagelijksevoortgang = 0;
+  late Stream<StepCount> _stepCountStream;
+  String _steps = '0';
+
+  @override
+  void initState() {
+    super.initState();
+    initPlatformState();
+
+  }
+
+  void onStepCount(StepCount event) {
+    print(event);
+    setState(() {
+      _steps = event.steps.toString();
+    });
+  }
+
+  void onStepCountError(error) {
+    print('onStepCountError: $error');
+    setState(() {
+      print('Step Count not available');
+    });
+  }
+
+  Future<bool> _checkActivityRecognitionPermission() async {
+    bool granted = await Permission.activityRecognition.isGranted;
+
+    if (!granted) {
+      granted = await Permission.activityRecognition.request() ==
+          PermissionStatus.granted;
+    }
+
+    return granted;
+  }
+
+  Future<void> initPlatformState() async {
+    bool granted = await _checkActivityRecognitionPermission();
+    if (!granted) {
+      print('geen toestemming');
+    }
+    _stepCountStream = Pedometer.stepCountStream;
+    _stepCountStream.listen(onStepCount).onError(onStepCountError);
+  }
+
+  late int waardedagelijksevoortgang = int.parse(_steps);
   double dagelijksevoortgang = 0.0;
-  String weergavedoelstappen = "0";
+  int weergavedoelstappen = 0;
   var kleur = Color.fromRGBO(151, 200, 130, 1);
 
   void _hogeredagelijksevoortgang() {
-    waardedagelijksevoortgang += 1000;
-    dagelijksevoortgang = waardedagelijksevoortgang/_doelstappen;
+    dagelijksevoortgang = waardedagelijksevoortgang / weergavedoelstappen;
 
     setState(() {
       if (dagelijksevoortgang >= 1.05) {
@@ -88,7 +131,7 @@ class _HomePageState extends State<HomePage> {
                 final result = await Navigator.pushNamed(context, '/instelling');
                 if (result != null && result is String) {
                   setState(() {
-                    weergavedoelstappen = result;
+                    weergavedoelstappen = int.parse(result);
                   });
                 }
               },
@@ -111,7 +154,7 @@ class _HomePageState extends State<HomePage> {
                       padding: EdgeInsetsDirectional.fromSTEB(30, 150, 30, 0),
                       child: Center(
                         child: Text(
-                          "$waardedagelijksevoortgang",
+                          _steps,
                           style: TextStyle(
                               fontSize: 82.0,
                               fontFamily: 'Tekst',
