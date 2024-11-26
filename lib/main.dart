@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+int _doelstappen = 0;
 
 
 void main() {
@@ -39,15 +40,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int waardedagelijksevoortgang = 0;
   double dagelijksevoortgang = 0.0;
   String weergavedoelstappen = "0";
   var kleur = Color.fromRGBO(151, 200, 130, 1);
 
   void _hogeredagelijksevoortgang() {
+    waardedagelijksevoortgang += 1000;
+    dagelijksevoortgang = waardedagelijksevoortgang/_doelstappen;
+
     setState(() {
-      dagelijksevoortgang = dagelijksevoortgang + 0.1;
-      if (dagelijksevoortgang >= 1.0) {
+      if (dagelijksevoortgang >= 1.05) {
         dagelijksevoortgang = 0.0;
+        waardedagelijksevoortgang = 0;
       }
       if (dagelijksevoortgang <= 0.25) {
         setState(() {
@@ -198,49 +203,97 @@ class Instellingen extends StatefulWidget {
 }
 
 class _InstellingenState extends State<Instellingen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _controller = TextEditingController();
   late int doelstappen;
+  bool gewichtInvoer = false;
+  late String gewichtLatenZien = ' ';
 
   void _toonInvoer() {
     String userInput = _controller.text;
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Je invoer is: $userInput')));
+    gewichtInvoer = true;
+    if (int.tryParse(userInput) != null) {
+      _doelstappen = int.parse(userInput);
+      setState(() {
+        gewichtLatenZien = userInput;
+      });
+    }
+    else{
+      gewichtInvoer = false;
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Vul een geldig getal tussen 1.000 en 50.000 in'),
+            backgroundColor: Colors.redAccent,
+          ));
+    }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
-      body: Column(
-        children: <Widget>[
-          Container(
-            padding: const EdgeInsetsDirectional.fromSTEB(30, 100, 30, 0),
-            height: 200,
-            child: TextField(
-              controller: _controller,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                  labelText: 'Voer iets in',
-                  labelStyle: TextStyle(
-                    fontFamily: "Tekst",
-                    fontSize: 30,
-                  ),// Labeltekst
-                  hintText: 'Bijvoorbeeld: Naam', // Plaatshoudertekst
-                  border: OutlineInputBorder()
+      body: Form(
+        key: _formKey,
+        child: Column(
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsetsDirectional.fromSTEB(30, 100, 30, 0),
+              height: 200,
+              child: TextFormField(
+                controller: _controller,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                    labelText: 'Voer je doelstappen in',
+                    labelStyle: TextStyle(
+                      fontFamily: "Tekst",
+                      fontSize: 30,
+                    ),// Labeltekst
+                    hintText: 'Kies tussen 1.000 en 50.000', // Plaatshoudertekst
+                    border: OutlineInputBorder()
+              ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Dit veld mag niet leeg zijn.';
+                  }
+                  if (int.tryParse(value) == null) {
+                    return 'Voer een geldig getal in.';
+                  }
+                  if (int.parse(value) <= 1000) {
+                    return 'Kies meer dan 1000 stappen voor een resultaat (dikzak)';
+                  }
+                  if (int.parse(value) >= 50000) {
+                    return 'Wees een beetje lief voor jezelf en kies een haalbaar doel';
+                  }
+                  return null;
+                },
+            )
             ),
-          )
-          ),
-          IconButton(
-            onPressed: _toonInvoer,
-            icon: Icon(Icons.send)
-          ),
-        ]
+            IconButton(
+              onPressed: _toonInvoer,
+              icon: Icon(Icons.send)
+            ),
+            Container(
+              padding: EdgeInsetsDirectional.fromSTEB(30,30,30,30),
+              child: Text(
+                  'Je doelstappen zijn: $gewichtLatenZien',
+                  style: TextStyle(
+                      color: Colors.grey[800],
+                      fontSize: 20.0,
+                      fontFamily: 'Tekst',
+                      fontWeight: FontWeight.w800
+                  )
+              )
+            )
+          ]
+        ),
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.pop(context, _controller.text);
-          },
-          child: const Icon(Icons.arrow_back)
+    if (_formKey.currentState!.validate()) {
+    Navigator.pop(context, _controller.text);
+    }
+    },
+            child: const Icon(Icons.arrow_back)
+
       ),
     );
   }
