@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import 'package:pedometer/pedometer.dart';
+import 'package:permission_handler/permission_handler.dart';
 int _doelstappen = 0;
 
 
@@ -104,11 +107,11 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsetsDirectional.fromSTEB(30, 40, 30, 40),
               child: Column(
                 children: <Widget>[
-                  const Padding(
+                  Padding(
                       padding: EdgeInsetsDirectional.fromSTEB(30, 150, 30, 0),
                       child: Center(
                         child: Text(
-                          '3.338',
+                          "$waardedagelijksevoortgang",
                           style: TextStyle(
                               fontSize: 82.0,
                               fontFamily: 'Tekst',
