@@ -91,11 +91,10 @@ class _HomePageState extends State<HomePage> {
 
   late int dagelijksestappen = int.parse(_steps);
   double dagelijksevoortgang = 0.0;
-  int weergavedoelstappen = 0;
   var kleur = Color.fromRGBO(151, 200, 130, 1);
 
   void _hogeredagelijksevoortgang() {
-    dagelijksevoortgang = dagelijksestappen / weergavedoelstappen;
+    dagelijksevoortgang = dagelijksestappen / _doelstappen;
 
     setState(() {
       if (dagelijksevoortgang <= 0.25) {
@@ -336,6 +335,13 @@ class _InstellingenState extends State<Instellingen> {
           onPressed: () {
     if (magDoor == true) {
     Navigator.pop(context, doorgeefWaarde);
+    }
+    else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Sla je keuze op'),
+            backgroundColor: Colors.redAccent,
+          ));
     }
     },
             child: const Icon(Icons.arrow_back)
