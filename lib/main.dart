@@ -4,6 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 int _doelstappen = 0;
+String _steps = '0';
+String userInput = '0';
+bool magDoor = false;
 
 
 void main() {
@@ -44,7 +47,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Stream<StepCount> _stepCountStream;
-  String _steps = '0';
 
   @override
   void initState() {
@@ -87,19 +89,15 @@ class _HomePageState extends State<HomePage> {
     _stepCountStream.listen(onStepCount).onError(onStepCountError);
   }
 
-  late int waardedagelijksevoortgang = int.parse(_steps);
+  late int dagelijksestappen = int.parse(_steps);
   double dagelijksevoortgang = 0.0;
   int weergavedoelstappen = 0;
   var kleur = Color.fromRGBO(151, 200, 130, 1);
 
   void _hogeredagelijksevoortgang() {
-    dagelijksevoortgang = waardedagelijksevoortgang / weergavedoelstappen;
+    dagelijksevoortgang = dagelijksestappen / weergavedoelstappen;
 
     setState(() {
-      if (dagelijksevoortgang >= 1.05) {
-        dagelijksevoortgang = 0.0;
-        waardedagelijksevoortgang = 0;
-      }
       if (dagelijksevoortgang <= 0.25) {
         setState(() {
           kleur = Color.fromRGBO(255, 28, 0, 1);
@@ -110,12 +108,12 @@ class _HomePageState extends State<HomePage> {
           kleur = Color.fromRGBO(255, 181, 0, 1);
         });
       }
-      else if (dagelijksevoortgang >= 0.61 && dagelijksevoortgang <= 0.91) {
+      else if (dagelijksevoortgang >= 0.61 && dagelijksevoortgang < 1) {
         setState(() {
           kleur = Color.fromRGBO(151, 200, 130, 1);
         });
       }
-      else if (dagelijksevoortgang >= 0.91 && dagelijksevoortgang <= 1) {
+      else if (dagelijksevoortgang >= 1) {
         setState(() {
           kleur = Color.fromRGBO(22, 143, 28, 1);
         });
@@ -128,10 +126,11 @@ class _HomePageState extends State<HomePage> {
       return Scaffold(
           floatingActionButton: FloatingActionButton(
               onPressed: () async {
+                magDoor = false;
                 final result = await Navigator.pushNamed(context, '/instelling');
                 if (result != null && result is String) {
                   setState(() {
-                    weergavedoelstappen = int.parse(result);
+                    _doelstappen = int.parse(result);
                   });
                 }
               },
@@ -206,7 +205,7 @@ class _HomePageState extends State<HomePage> {
                       Padding(
                         padding: EdgeInsets.only(left: 250)
                       ),
-                      Text("$weergavedoelstappen",
+                      Text("$_doelstappen",
                           style: TextStyle(
                               fontFamily: "Tekst",
                               color: Colors.grey[800],
@@ -252,20 +251,21 @@ class _InstellingenState extends State<Instellingen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _controller = TextEditingController();
   late int doelstappen;
-  bool gewichtInvoer = false;
   late String gewichtLatenZien = ' ';
+  bool magDoor = false;
+  String doorgeefWaarde = '';
 
   void _toonInvoer() {
     String userInput = _controller.text;
-    gewichtInvoer = true;
-    if (int.tryParse(userInput) != null) {
+    if (int.tryParse(userInput) != null && int.parse(userInput) >= 1000 && int.parse(userInput) <= 50000) {
       _doelstappen = int.parse(userInput);
+      magDoor = true;
+      doorgeefWaarde = userInput;
       setState(() {
         gewichtLatenZien = userInput;
       });
     }
     else{
-      gewichtInvoer = false;
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Vul een geldig getal tussen 1.000 en 50.000 in'),
@@ -303,7 +303,7 @@ class _InstellingenState extends State<Instellingen> {
                   if (int.tryParse(value) == null) {
                     return 'Voer een geldig getal in.';
                   }
-                  if (int.parse(value) <= 1000) {
+                  if (int.parse(value) <= 1) {
                     return 'Kies meer dan 1000 stappen voor een resultaat (dikzak)';
                   }
                   if (int.parse(value) >= 50000) {
@@ -334,8 +334,8 @@ class _InstellingenState extends State<Instellingen> {
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
-    if (_formKey.currentState!.validate()) {
-    Navigator.pop(context, _controller.text);
+    if (magDoor == true) {
+    Navigator.pop(context, doorgeefWaarde);
     }
     },
             child: const Icon(Icons.arrow_back)
