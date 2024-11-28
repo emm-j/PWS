@@ -5,6 +5,7 @@ import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 int _doelstappen = 0;
 String _steps = '0';
+String opgeslagensteps = '0';
 String userInput = '0';
 bool magDoor = false;
 var vandaag = DateTime.now();
@@ -52,10 +53,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     initPlatformState();
-    if (vandaag.day > lastModified().day){
-      _steps = '0';
-    }
-    print(_steps);
   }
 
   void onStepCount(StepCount event) {
@@ -67,6 +64,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   DateTime lastModified() {
+    opgeslagensteps = _steps;
     return DateTime.now();
   }
 
@@ -93,6 +91,10 @@ class _HomePageState extends State<HomePage> {
     if (!granted) {
       print('geen toestemming');
     }
+    if (vandaag.day > lastModified().day){
+      _steps = (int.parse(_steps) - int.parse(opgeslagensteps)).toString();
+    }
+    print(_steps);
     _stepCountStream = Pedometer.stepCountStream;
     _stepCountStream.listen(onStepCount).onError(onStepCountError);
   }
