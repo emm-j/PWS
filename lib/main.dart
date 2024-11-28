@@ -52,7 +52,10 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     initPlatformState();
-
+    if (vandaag.day > lastModified().day){
+      _steps = '0';
+    }
+    print(_steps);
   }
 
   void onStepCount(StepCount event) {
@@ -61,10 +64,6 @@ class _HomePageState extends State<HomePage> {
       _steps = event.steps.toString();
     });
     lastModified();
-    if (vandaag.day > lastModified().day){
-       _steps = '0';
-    }
-    print(_steps);
   }
 
   DateTime lastModified() {
