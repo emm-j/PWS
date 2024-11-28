@@ -7,7 +7,7 @@ int _doelstappen = 0;
 String _steps = '0';
 String userInput = '0';
 bool magDoor = false;
-
+var vandaag = DateTime.now();
 
 void main() {
   runApp(const MyApp(
@@ -60,6 +60,15 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _steps = event.steps.toString();
     });
+    lastModified();
+    if (vandaag.day > lastModified().day){
+       _steps = '0';
+    }
+    print(_steps);
+  }
+
+  DateTime lastModified() {
+    return DateTime.now();
   }
 
   void onStepCountError(error) {
