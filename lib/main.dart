@@ -4,8 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 int _doelstappen = 0;
-String _doelstappenMetPunt = '0';
-String _steps = '1000';
+String _steps = '0';
 String userInput = '0';
 bool magDoor = false;
 
@@ -21,7 +20,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       routes: {
         '/': (context) => const HomePage(),
         '/instelling': (context) => const Instellingen(),
@@ -96,41 +94,30 @@ class _HomePageState extends State<HomePage> {
   var kleur = Color.fromRGBO(151, 200, 130, 1);
 
   void _hogeredagelijksevoortgang() {
-    if (_doelstappen > 0) {
-      dagelijksevoortgang = dagelijksestappen / _doelstappen;
-      print(_doelstappen);
-      print(dagelijksestappen);
+    dagelijksevoortgang = dagelijksestappen / _doelstappen;
 
-      setState(() {
-        if (dagelijksevoortgang <= 0.25) {
-          setState(() {
-            kleur = Color.fromRGBO(255, 28, 0, 1);
-          });
-        }
-        else if (dagelijksevoortgang >= 0.25 && dagelijksevoortgang <= 0.61) {
-          setState(() {
-            kleur = Color.fromRGBO(255, 181, 0, 1);
-          });
-        }
-        else if (dagelijksevoortgang >= 0.61 && dagelijksevoortgang < 1) {
-          setState(() {
-            kleur = Color.fromRGBO(151, 200, 130, 1);
-          });
-        }
-        else if (dagelijksevoortgang >= 1) {
-          setState(() {
-            kleur = Color.fromRGBO(22, 143, 28, 1);
-          });
-        }
-      });
-    }
-    else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Stel eerst je doelstappen in'),
-            backgroundColor: Colors.redAccent,
-          ));
-    }
+    setState(() {
+      if (dagelijksevoortgang <= 0.25) {
+        setState(() {
+          kleur = Color.fromRGBO(255, 28, 0, 1);
+        });
+      }
+      else if (dagelijksevoortgang >= 0.25 && dagelijksevoortgang <= 0.61) {
+        setState(() {
+          kleur = Color.fromRGBO(255, 181, 0, 1);
+        });
+      }
+      else if (dagelijksevoortgang >= 0.61 && dagelijksevoortgang < 1) {
+        setState(() {
+          kleur = Color.fromRGBO(151, 200, 130, 1);
+        });
+      }
+      else if (dagelijksevoortgang >= 1) {
+        setState(() {
+          kleur = Color.fromRGBO(22, 143, 28, 1);
+        });
+      }
+    });
   }
 
     @override
@@ -217,7 +204,7 @@ class _HomePageState extends State<HomePage> {
                       Padding(
                         padding: EdgeInsets.only(left: 250)
                       ),
-                      Text("$_doelstappenMetPunt",
+                      Text("$_doelstappen",
                           style: TextStyle(
                               fontFamily: "Tekst",
                               color: Colors.grey[800],
@@ -266,18 +253,16 @@ class _InstellingenState extends State<Instellingen> {
   late String gewichtLatenZien = ' ';
   bool magDoor = false;
   String doorgeefWaarde = '';
-  String _doorgeefWaardeLatenZien = '';
 
   void _toonInvoer() {
     String userInput = _controller.text;
     if (int.tryParse(userInput) != null && int.parse(userInput) >= 1000 && int.parse(userInput) <= 50000) {
       _doelstappen = int.parse(userInput);
-      String getalMetPuntlatenzien = getalMetPunt(userInput);
       magDoor = true;
       doorgeefWaarde = getalMetPunt(userInput);
       setState(() {
-        _doorgeefWaardeLatenZien = getalMetPuntlatenzien;
-        print(_doorgeefWaardeLatenZien);
+        gewichtLatenZien = getalMetPunt(userInput);
+        print(gewichtLatenZien);
       });
     }
     else{
@@ -335,7 +320,7 @@ class _InstellingenState extends State<Instellingen> {
             Container(
               padding: EdgeInsetsDirectional.fromSTEB(30,30,30,30),
               child: Text(
-                  'Je doelstappen zijn: $_doorgeefWaardeLatenZien',
+                  'Je doelstappen zijn: $gewichtLatenZien',
                   style: TextStyle(
                       color: Colors.grey[800],
                       fontSize: 20.0,
@@ -350,10 +335,7 @@ class _InstellingenState extends State<Instellingen> {
       floatingActionButton: FloatingActionButton(
           onPressed: () {
     if (magDoor == true) {
-    Navigator.pop(context, doorgeefWaarde);
-    }
-    else if (_doelstappen >= 1000 && _doelstappen <= 50000) {
-      Navigator.pop(context, doorgeefWaarde);
+    Navigator.pop(context, doorgeefWaarde.toString());
     }
     else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -393,9 +375,9 @@ class DateWidget extends StatelessWidget {
   }
 }
 
- getalMetPunt(getal) {
-    int getalInt = int.parse(getal);
-    String _doelstappenMetPunt = NumberFormat("#,##0", "nl_NL").format(getalInt);
+getalMetPunt(getal) {
+  final formatter = NumberFormat("#,###", "nl_NL"); // "nl_NL" voor Nederlandse notatie
+  String _getalMetPunt = formatter.format(int.parse(getal));
 
-    return _doelstappenMetPunt;
-  }
+  return _getalMetPunt;
+}
