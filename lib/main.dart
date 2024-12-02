@@ -3,6 +3,9 @@ import 'package:intl/intl.dart';
 
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+import 'package:drift/drift.dart';
+part 'database.g.dart';
 int _doelstappen = 0;
 String _steps = '0';
 String userInput = '0';
@@ -380,4 +383,8 @@ getalMetPunt(getal) {
   String _getalMetPunt = formatter.format(int.parse(getal));
 
   return _getalMetPunt;
+}
+
+class userData extends Table {
+
 }
