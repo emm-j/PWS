@@ -17,7 +17,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -48,14 +47,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Stream<StepCount> _stepCountStream;
-
   final cron = Cron();
 
   void resetten() async {
-    cron.schedule((Schedule.parse("0 */1 * * *")), () async {
-       int nieuwe_stappen = int.parse(_steps);
-       _steps = (int.parse(_steps) - nieuwe_stappen).toString();
-    });
+
   }
   @override
   void initState() {
@@ -64,10 +59,12 @@ class _HomePageState extends State<HomePage> {
 
   }
 
-  void onStepCount(StepCount event) {
+  void onStepCount(StepCount event) async{
+
     print(event);
     setState(() {
       _steps = event.steps.toString();
+      DateTime updatetijd = event.timeStamp;
     });
   }
 

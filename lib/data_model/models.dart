@@ -1,19 +1,12 @@
 class Doel {
-  final int id;
-  final String title;
-
-  final String createdAt;
-  final String? updatedAt;
+  final int stappen;
+  final DateTime updatetijd;
   Doel({
-    required this.id,
-    required this.title,
-    required this.createdAt,
-    this.updatedAt,
+    required this.stappen,
+    required this.updatetijd,
   });
   factory Doel.fromSqfliteDatabase(Map<String, dynamic> map) => Doel(
-    id: map['id']?.toInt() ?? 0,
-    title: map['title'] ?? '',
-    createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at']).toIso8601String(),
-    updatedAt: map['updated_at'] == null ? null : DateTime.fromMillisecondsSinceEpoch(map['updated_at']).toIso8601String(),
+    stappen: map['stappen']?.toInt() ?? 0,
+    updatetijd: DateTime.now(),
   );
 }
