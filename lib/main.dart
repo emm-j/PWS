@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'package:sqflite/sqflite.dart';
 int _doelstappen = 0;
 String _steps = '0';
 String userInput = '0';
@@ -384,5 +383,3 @@ getalMetPunt(getal) {
   return _getalMetPunt;
 }
 
-var dbpad = getDatabasesPath();
-String pad = dbpad.toString() + 'data.db';
