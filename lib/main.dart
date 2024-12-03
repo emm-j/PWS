@@ -384,4 +384,5 @@ getalMetPunt(getal) {
   return _getalMetPunt;
 }
 
-var db = openDatabase('my_db.db');
+var dbpad = getDatabasesPath();
+String pad = dbpad.toString() + 'data.db';
