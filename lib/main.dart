@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
-
+import 'package:cron/cron.dart';
 int _doelstappen = 0;
 String _steps = '0';
 String userInput = '0';
@@ -49,6 +49,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late Stream<StepCount> _stepCountStream;
 
+  final cron = Cron();
+
+  void resetten() async {
+    cron.schedule((Schedule.parse("0 */1 * * *")), () async {
+       int nieuwe_stappen = int.parse(_steps);
+       _steps = (int.parse(_steps) - nieuwe_stappen).toString();
+    });
+  }
   @override
   void initState() {
     super.initState();
