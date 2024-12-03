@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:cron/cron.dart';
@@ -8,7 +8,7 @@ int _doelstappen = 0;
 String _steps = '0';
 String userInput = '0';
 bool magDoor = false;
-
+int _stepOffset = 0;
 
 void main() {
   runApp(const MyApp(
@@ -49,22 +49,39 @@ class _HomePageState extends State<HomePage> {
   late Stream<StepCount> _stepCountStream;
   final cron = Cron();
 
-  void resetten() async {
+  void resetten() {
+    _stepOffset = int.parse(_steps) + _stepOffset; // Werk de offset bij
+    setState(() {
+      _steps = '0'; // Reset de weergave
+      dagelijksevoortgang = 0.0; // Reset voortgang
+    });
+    saveOffset(); // Sla de nieuwe offset op
+  }
+  void saveOffset() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('stepOffset', _stepOffset);
+  }
 
+  void loadOffset() async {
+    final prefs = await SharedPreferences.getInstance();
+    _stepOffset = prefs.getInt('stepOffset') ?? 0;
   }
   @override
   void initState() {
     super.initState();
     initPlatformState();
-
+    cron.schedule(Schedule.parse('0 0 * * *'), () async {
+      resetten();
+    });
+    loadOffset();
   }
 
   void onStepCount(StepCount event) async{
 
     print(event);
     setState(() {
-      _steps = event.steps.toString();
-      DateTime updatetijd = event.timeStamp;
+      int rawSteps = event.steps;
+      _steps = (rawSteps - _stepOffset).toString();
     });
   }
 
