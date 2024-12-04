@@ -66,11 +66,12 @@ class _HomePageState extends State<HomePage> {
     final prefs = await SharedPreferences.getInstance();
     _stepOffset = prefs.getInt('stepOffset') ?? 0;
   }
+
   @override
   void initState() {
     super.initState();
     initPlatformState();
-    cron.schedule(Schedule.parse('0 0 * * *'), () async {
+    cron.schedule(Schedule.parse('* */24 * * *'), () async {
       resetten();
     });
     loadOffset();
