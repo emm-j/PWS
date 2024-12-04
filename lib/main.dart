@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:cron/cron.dart';
 int _doelstappen = 0;
 String _doelstappenweergeven = '0';
 String _steps = '0';
 String userInput = '0';
 bool magDoor = false;
-
+int _stepOffset = 0;
 
 void main() {
   runApp(const MyApp(
@@ -17,7 +18,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -48,17 +48,50 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Stream<StepCount> _stepCountStream;
+  final cron = Cron();
+
+  void checkAndResetSteps() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? lastResetDate = prefs.getString('lastResetDate'); // Ophalen van opgeslagen datum
+
+    String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now()); // Huidige datum
+
+    if (lastResetDate != todayDate) { // Controle of reset nodig is
+      resetten(); // Reset stappen
+      prefs.setString('lastResetDate', todayDate); // Update de opgeslagen datum
+    }
+  }
+  void resetten() {
+    _stepOffset = int.parse(_steps) + _stepOffset; // Werk de offset bij
+    setState(() {
+      _steps = '0';
+      dagelijksevoortgang = 0.0;
+    });
+    saveOffset(); // Sla de nieuwe offset op
+  }
+  void saveOffset() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('stepOffset', _stepOffset);
+    String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    await prefs.setString('lastResetDate', todayDate); // Sla de datum op
+  }
+  void loadOffset() async {
+    final prefs = await SharedPreferences.getInstance();
+    _stepOffset = prefs.getInt('stepOffset') ?? 0;
+  }
 
   @override
   void initState() {
     super.initState();
     initPlatformState();
-
+    checkAndResetSteps();
+    loadOffset();
   }
+  void onStepCount(StepCount event) async{
 
-  void onStepCount(StepCount event) {
     setState(() {
-      _steps = event.steps.toString();
+      int rawSteps = event.steps;
+      _steps = (rawSteps - _stepOffset).toString();
     });
   }
 
@@ -333,18 +366,18 @@ class _InstellingenState extends State<Instellingen> {
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
-    if (magDoor == true) {
-    Navigator.pop(context, doorgeefWaarde.toString());
-    }
-    else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Sla je keuze op'),
-            backgroundColor: Colors.redAccent,
-          ));
-    }
-    },
-            child: const Icon(Icons.arrow_back)
+            if (magDoor == true) {
+              Navigator.pop(context, doorgeefWaarde);
+              }
+              else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Sla je keuze op'),
+                      backgroundColor: Colors.redAccent,
+                    ));
+              }
+              },
+                      child: const Icon(Icons.arrow_back)
 
       ),
     );
@@ -380,3 +413,4 @@ getalMetPunt(getal) {
 
   return _getalMetPunt;
 }
+
