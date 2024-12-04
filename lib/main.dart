@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 int _doelstappen = 0;
+String _doelstappenweergeven = '0';
 String _steps = '0';
 String userInput = '0';
 bool magDoor = false;
@@ -56,7 +57,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   void onStepCount(StepCount event) {
-    print(event);
     setState(() {
       _steps = event.steps.toString();
     });
@@ -129,7 +129,7 @@ class _HomePageState extends State<HomePage> {
                 final result = await Navigator.pushNamed(context, '/instelling');
                 if (result != null && result is String) {
                   setState(() {
-                    _doelstappen = int.parse(result);
+                    _doelstappenweergeven = result;
                   });
                 }
               },
@@ -204,7 +204,7 @@ class _HomePageState extends State<HomePage> {
                       Padding(
                         padding: EdgeInsets.only(left: 250)
                       ),
-                      Text("$_doelstappen",
+                      Text("$_doelstappenweergeven",
                           style: TextStyle(
                               fontFamily: "Tekst",
                               color: Colors.grey[800],
@@ -262,7 +262,6 @@ class _InstellingenState extends State<Instellingen> {
       doorgeefWaarde = getalMetPunt(userInput);
       setState(() {
         gewichtLatenZien = getalMetPunt(userInput);
-        print(gewichtLatenZien);
       });
     }
     else{
