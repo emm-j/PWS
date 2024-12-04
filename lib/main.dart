@@ -49,6 +49,18 @@ class _HomePageState extends State<HomePage> {
   late Stream<StepCount> _stepCountStream;
   final cron = Cron();
 
+  void checkAndResetSteps() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? lastResetDate = prefs.getString('lastResetDate'); // Ophalen van opgeslagen datum
+
+    String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now()); // Huidige datum
+
+    if (lastResetDate != todayDate) { // Controle of reset nodig is
+      resetten(); // Reset stappen
+      prefs.setString('lastResetDate', todayDate); // Update de opgeslagen datum
+    }
+  }
+
   void resetten() {
     _stepOffset = int.parse(_steps) + _stepOffset; // Werk de offset bij
     setState(() {
@@ -60,6 +72,8 @@ class _HomePageState extends State<HomePage> {
   void saveOffset() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('stepOffset', _stepOffset);
+    String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    await prefs.setString('lastResetDate', todayDate); // Sla de datum op
   }
 
   void loadOffset() async {
@@ -71,9 +85,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     initPlatformState();
-    cron.schedule(Schedule.parse('* */24 * * *'), () async {
-      resetten();
-    });
+    checkAndResetSteps();
     loadOffset();
   }
 
