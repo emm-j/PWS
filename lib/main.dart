@@ -24,6 +24,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const HomePage(),
         '/instelling': (context) => const Instellingen(),
+        '/levels': (context) => const Levels()
       },
     );
   }
@@ -124,7 +125,7 @@ class _HomePageState extends State<HomePage> {
 
   late int dagelijksestappen = int.parse(_steps);
   double dagelijksevoortgang = 0.0;
-  var kleur = Color.fromRGBO(151, 200, 130, 1);
+  var kleur = const Color.fromRGBO(151, 200, 130, 1);
 
   void _hogeredagelijksevoortgang() {
     dagelijksevoortgang = dagelijksestappen / _doelstappen;
@@ -132,22 +133,22 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       if (dagelijksevoortgang <= 0.25) {
         setState(() {
-          kleur = Color.fromRGBO(255, 28, 0, 1);
+          kleur = const Color.fromRGBO(255, 28, 0, 1);
         });
       }
       else if (dagelijksevoortgang >= 0.25 && dagelijksevoortgang <= 0.61) {
         setState(() {
-          kleur = Color.fromRGBO(255, 181, 0, 1);
+          kleur = const Color.fromRGBO(255, 181, 0, 1);
         });
       }
       else if (dagelijksevoortgang >= 0.61 && dagelijksevoortgang < 1) {
         setState(() {
-          kleur = Color.fromRGBO(151, 200, 130, 1);
+          kleur = const Color.fromRGBO(151, 200, 130, 1);
         });
       }
       else if (dagelijksevoortgang >= 1) {
         setState(() {
-          kleur = Color.fromRGBO(22, 143, 28, 1);
+          kleur = const Color.fromRGBO(22, 143, 28, 1);
         });
       }
     });
@@ -174,7 +175,7 @@ class _HomePageState extends State<HomePage> {
             child: AppBar(
               centerTitle: true,
               backgroundColor: const Color.fromRGBO(151, 200, 130, 1),
-              title: DateWidget(),
+              title: const DateWidget(),
             ),
           ),
           body: Padding(
@@ -182,11 +183,11 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 children: <Widget>[
                   Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(30, 150, 30, 0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(30, 150, 30, 0),
                       child: Center(
                         child: Text(
                           _steps,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 82.0,
                               fontFamily: 'Tekst',
                               fontWeight: FontWeight.w800,
@@ -234,7 +235,7 @@ class _HomePageState extends State<HomePage> {
                         fontSize: 20,
                         fontWeight: FontWeight.w800
                       )),
-                      Padding(
+                      const Padding(
                         padding: EdgeInsets.only(left: 250)
                       ),
                       Text("$_doelstappenweergeven",
@@ -254,13 +255,15 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.amber,
                     ),
                     child: IconButton(
-                      icon: Icon(Icons.add,
+                      icon: const Icon(Icons.add,
                       size: 30),
                       onPressed: () {
                         _hogeredagelijksevoortgang();
                       }
-                    )
-                  )
+                    ),
+                  ),
+                  IconButton(onPressed: () {Navigator.pushNamed(context, '/levels');},
+                      icon: Icon(Icons.ac_unit_rounded))
 
 
                 ],
@@ -299,7 +302,7 @@ class _InstellingenState extends State<Instellingen> {
     }
     else{
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Vul een geldig getal tussen 1.000 en 50.000 in'),
             backgroundColor: Colors.redAccent,
           ));
@@ -347,10 +350,10 @@ class _InstellingenState extends State<Instellingen> {
             ),
             IconButton(
               onPressed: _toonInvoer,
-              icon: Icon(Icons.send)
+              icon: const Icon(Icons.send)
             ),
             Container(
-              padding: EdgeInsetsDirectional.fromSTEB(30,30,30,30),
+              padding: const EdgeInsetsDirectional.fromSTEB(30,30,30,30),
               child: Text(
                   'Je doelstappen zijn: $gewichtLatenZien',
                   style: TextStyle(
@@ -384,6 +387,37 @@ class _InstellingenState extends State<Instellingen> {
   }
 }
 
+class Levels extends StatefulWidget {
+  const Levels({super.key});
+
+  @override
+  State<Levels> createState() => _LevelsState();
+}
+
+class _LevelsState extends State<Levels> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        backgroundColor: Colors.grey[200],
+        body: Column(
+          children: <Widget>[
+            Container(
+              decoration: const BoxDecoration(
+                color: Colors.amber
+              )
+            ),
+            IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(Icons.ac_unit_outlined)
+            )
+          ],
+        )
+    );
+  }
+}
+
 
 class DateWidget extends StatelessWidget {
   const DateWidget({super.key});
@@ -396,7 +430,7 @@ class DateWidget extends StatelessWidget {
 
     return Text(
         '$formattedDate',
-        style: TextStyle(
+        style: const TextStyle(
             color: Colors.white,
             fontSize: 40.0,
             fontFamily: 'Tekst',
