@@ -6,7 +6,9 @@ import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:cron/cron.dart';
 
+var mainGroen = const Color.fromRGBO(151, 200, 130, 1);
 int _doelstappen = 0;
+String _doelstappenMetPunt = '0';
 String _doelstappenweergeven = '0';
 String _steps = '0';
 String userInput = '0';
@@ -25,7 +27,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       routes: {
         '/': (context) => const HomePage(),
-        '/instelling': (context) => const Instellingen(),
+        '/settings': (context) => const Settings(),
         '/levels': (context) => const Levels()
       },
     );
@@ -46,7 +48,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Stream<StepCount> _stepCountStream;
+  var kleur = mainGroen;
   final cron = Cron();
+  late int dagelijksestappen = int.parse(_steps);
+  double dagelijksevoortgang = 0.0;
 
   void checkAndResetSteps() async {
     final prefs = await SharedPreferences.getInstance();
@@ -62,7 +67,6 @@ class _HomePageState extends State<HomePage> {
       prefs.setString('lastResetDate', todayDate); // Update de opgeslagen datum
     }
   }
-
   void resetten() {
     _stepOffset = int.parse(_steps) + _stepOffset; // Werk de offset bij
     setState(() {
@@ -71,14 +75,12 @@ class _HomePageState extends State<HomePage> {
     });
     saveOffset(); // Sla de nieuwe offset op
   }
-
   void saveOffset() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('stepOffset', _stepOffset);
     String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
     await prefs.setString('lastResetDate', todayDate); // Sla de datum op
   }
-
   void loadOffset() async {
     final prefs = await SharedPreferences.getInstance();
     _stepOffset = prefs.getInt('stepOffset') ?? 0;
@@ -98,14 +100,12 @@ class _HomePageState extends State<HomePage> {
       _steps = (rawSteps - _stepOffset).toString();
     });
   }
-
   void onStepCountError(error) {
     print('onStepCountError: $error');
     setState(() {
       print('Step Count not available');
     });
   }
-
   Future<bool> _checkActivityRecognitionPermission() async {
     bool granted = await Permission.activityRecognition.isGranted;
 
@@ -116,7 +116,6 @@ class _HomePageState extends State<HomePage> {
 
     return granted;
   }
-
   Future<void> initPlatformState() async {
     bool granted = await _checkActivityRecognitionPermission();
     if (!granted) {
@@ -125,10 +124,6 @@ class _HomePageState extends State<HomePage> {
     _stepCountStream = Pedometer.stepCountStream;
     _stepCountStream.listen(onStepCount).onError(onStepCountError);
   }
-
-  late int dagelijksestappen = int.parse(_steps);
-  double dagelijksevoortgang = 0.0;
-  var kleur = const Color.fromRGBO(151, 200, 130, 1);
 
   void _hogeredagelijksevoortgang() {
     dagelijksevoortgang = dagelijksestappen / _doelstappen;
@@ -151,23 +146,21 @@ class _HomePageState extends State<HomePage> {
           kleur = const Color.fromRGBO(22, 143, 28, 1);
         });
       }
+    });    }
+  void _updateDoelstappen() {
+    setState(() {
+      _doelstappenweergeven = _doelstappenMetPunt;
     });
   }
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateDoelstappen();
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton: FloatingActionButton(
-            onPressed: () async {
-              magDoor = false;
-              final result = await Navigator.pushNamed(context, '/instelling');
-              if (result != null && result is String) {
-                setState(() {
-                  _doelstappenweergeven = result;
-                });
-              }
-            },
-            child: const Icon(Icons.arrow_forward)),
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(80),
           child: AppBar(
@@ -176,97 +169,124 @@ class _HomePageState extends State<HomePage> {
             title: const DateWidget(),
           ),
         ),
-        body: Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(30, 40, 30, 40),
-            child: Column(
-              children: <Widget>[
-                Padding(
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(30, 150, 30, 0),
-                    child: Center(
-                      child: Text(
-                        _steps,
-                        style: const TextStyle(
-                            fontSize: 82.0,
+        body: Column(
+          children: <Widget>[
+            Padding(
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(30, 150, 30, 0),
+                child: Center(
+                  child: Text(
+                    _steps,
+                    style: const TextStyle(
+                        fontSize: 82.0,
+                        fontFamily: 'Tekst',
+                        fontWeight: FontWeight.w800,
+                        color: Colors.amber),
+                  ),
+                )),
+            Padding(
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(30, 15, 30, 20),
+                child: Center(
+                    child: Text('stappen vandaag gezet',
+                        style: TextStyle(
+                            fontSize: 20,
                             fontFamily: 'Tekst',
                             fontWeight: FontWeight.w800,
-                            color: Colors.amber),
-                      ),
-                    )),
-                Padding(
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(30, 15, 30, 20),
-                    child: Center(
-                        child: Text('stappen vandaag gezet',
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontFamily: 'Tekst',
-                                fontWeight: FontWeight.w800,
-                                color: Colors.grey[800])))),
-                Padding(
-                    padding: const EdgeInsetsDirectional.all(20.0),
-                    child: Center(
-                        child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: LinearProgressIndicator(
-                        value: dagelijksevoortgang,
-                        valueColor: AlwaysStoppedAnimation(kleur),
-                        minHeight: 30,
-                      ),
-                    ))),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text("0",
-                        style: TextStyle(
-                            fontFamily: "Tekst",
-                            color: Colors.grey[800],
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800)),
-                    const Padding(padding: EdgeInsets.only(left: 250)),
-                    Text("$_doelstappenweergeven",
-                        style: TextStyle(
-                            fontFamily: "Tekst",
-                            color: Colors.grey[800],
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800))
-                  ],
-                ),
-                Container(
-                  height: 65,
-                  width: 65,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.amber,
+                            color: Colors.grey[800])))),
+            Padding(
+                padding: const EdgeInsetsDirectional.all(20.0),
+                child: Center(
+                    child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: LinearProgressIndicator(
+                    value: dagelijksevoortgang,
+                    valueColor: AlwaysStoppedAnimation(kleur),
+                    minHeight: 30,
                   ),
-                  child: IconButton(
-                      icon: const Icon(Icons.add, size: 30),
-                      onPressed: () {
-                        _hogeredagelijksevoortgang();
-                      }),
-                ),
-                IconButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/levels');
-                    },
-                    icon: const Icon(Icons.ac_unit_rounded))
+                ))),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text("0",
+                    style: TextStyle(
+                        fontFamily: "Tekst",
+                        color: Colors.grey[800],
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800)),
+                const Padding(padding: EdgeInsets.only(left: 250)),
+                Text("$_doelstappenweergeven",
+                    style: TextStyle(
+                        fontFamily: "Tekst",
+                        color: Colors.grey[800],
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800))
               ],
-            )));
+            ),
+            Container(
+              height: 65,
+              width: 65,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.amber,
+              ),
+              child: IconButton(
+                  icon: const Icon(Icons.add, size: 30),
+                  onPressed: () {
+                    _hogeredagelijksevoortgang();
+                  }),
+            ),
+            Spacer(),
+            Container(
+              height: 80,
+              decoration:
+              BoxDecoration(color: Color.fromRGBO(151, 200, 130, 1)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Container(
+                      height: 60,
+                      child: IconButton(
+                        onPressed: () {Navigator.pushNamed(context, '/levels');}, icon: Icon(Icons.grid_view_rounded),
+                        iconSize: 50
+                        ,
+                      )),
+                  Container(
+                      height: 60,
+                      child: IconButton(
+                        onPressed: () {}, icon: Icon(Icons.home, color: Colors.grey[100]),
+                        iconSize: 50,
+                      )),
+                  Container(
+                      height: 60,
+                      child: IconButton(
+                        onPressed: () {
+                          print(_doelstappenMetPunt);
+                          Navigator.pushNamed(context, '/settings');
+                          magDoor = false;
+                          },
+                        icon: Icon(Icons.settings),
+                        iconSize: 50,
+                      )),
+                ],
+              ),
+            ),
+          ],
+        ));
   }
 }
 
-class Instellingen extends StatefulWidget {
-  const Instellingen({super.key});
+class Settings extends StatefulWidget {
+  const Settings({super.key});
 
   @override
-  State<Instellingen> createState() => _InstellingenState();
+  State<Settings> createState() => _SettingsState();
 }
 
-class _InstellingenState extends State<Instellingen> {
+class _SettingsState extends State<Settings> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _controller = TextEditingController();
   late int doelstappen;
-  late String gewichtLatenZien = ' ';
   bool magDoor = false;
   String doorgeefWaarde = '';
 
@@ -279,7 +299,7 @@ class _InstellingenState extends State<Instellingen> {
       magDoor = true;
       doorgeefWaarde = getalMetPunt(userInput);
       setState(() {
-        gewichtLatenZien = getalMetPunt(userInput);
+        _doelstappenMetPunt = getalMetPunt(userInput);
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -330,26 +350,60 @@ class _InstellingenState extends State<Instellingen> {
           IconButton(onPressed: _toonInvoer, icon: const Icon(Icons.send)),
           Container(
               padding: const EdgeInsetsDirectional.fromSTEB(30, 30, 30, 30),
-              child: Text('Je doelstappen zijn: $gewichtLatenZien',
+              child: Text('Je doelstappen zijn: $_doelstappenMetPunt',
                   style: TextStyle(
                       color: Colors.grey[800],
                       fontSize: 20.0,
                       fontFamily: 'Tekst',
-                      fontWeight: FontWeight.w800)))
+                      fontWeight: FontWeight.w800))),
+          Spacer(),
+
+          Container(
+            height: 80,
+            decoration:
+            BoxDecoration(color: Color.fromRGBO(151, 200, 130, 1)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Container(
+                    height: 60,
+                    child: IconButton(
+                        onPressed: () {Navigator.pushNamed(context, '/levels');},
+                      icon: Icon(Icons.grid_view_rounded),
+                      iconSize: 50
+                    )),
+                Container(
+                    height: 60,
+                    child: IconButton(
+                      onPressed: () {
+                        if (_doelstappen >= 1000 && _doelstappen <= 50000) {
+                          _doelstappenMetPunt = getalMetPunt(_doelstappen.toString());
+                          Navigator.pushNamed(context, '/');
+                          didChangeDependencies();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                            content: Text('Sla je keuze op'),
+                            backgroundColor: Colors.redAccent,
+                          ));
+                        }
+                      },
+                      icon: Icon(Icons.home),
+                      iconSize: 50,
+                    )),
+                Container(
+                    height: 60,
+                    child: IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.settings, color: Colors.grey[100]),
+                        iconSize: 50
+                    )),
+              ],
+            ),
+          ),
         ]),
+
       ),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            if (magDoor == true) {
-              Navigator.pop(context, doorgeefWaarde);
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Sla je keuze op'),
-                backgroundColor: Colors.redAccent,
-              ));
-            }
-          },
-          child: const Icon(Icons.arrow_back)),
+
     );
   }
 }
@@ -371,11 +425,6 @@ class _LevelsState extends State<Levels> {
             Container(decoration: const BoxDecoration(color: Colors.amber)),
             Container(
               height: 60,
-              child: IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(Icons.ac_unit_outlined)),
             ),
             for (int i = 0; i < 1000; i += 100)
               Container(
@@ -394,31 +443,25 @@ class _LevelsState extends State<Levels> {
                   Container(
                     height: 60,
                       child: IconButton(
-                          onPressed: () {}, icon: Icon(Icons.grid_view_rounded),
+                          onPressed: () {}, icon: Icon(Icons.grid_view_rounded, color: Colors.grey[100]),
                         iconSize: 50
                         ,
                       )),
                   Container(
                       height: 60,
                       child: IconButton(
-                        onPressed: () {}, icon: Icon(Icons.home, color: Colors.grey[100]),
+                        onPressed: () {Navigator.pushNamed(context, '/');}, icon: Icon(Icons.home),
                         iconSize: 50,
                       )),
                   Container(
                       height: 60,
                       child: IconButton(
-                        onPressed: () {}, icon: Icon(Icons.settings),
+                        onPressed: () {Navigator.pushNamed(context, '/settings');}, icon: Icon(Icons.settings),
                         iconSize: 50,
                       )),
                 ],
               ),
             ),
-            //* for (int i = 0; i < 1000; i += 100 )
-            //Container(
-            //  height: 20,
-            //decoration: BoxDecoration(
-            //color: Colors.amber[i]
-            //  ),
           ],
         ));
   }
