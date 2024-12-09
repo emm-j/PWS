@@ -93,7 +93,14 @@ class _HomePageState extends State<HomePage> {
   void haalInvoerop() async {
     final prefs = await SharedPreferences.getInstance();
     userInput = prefs.getString('invoer') ?? '0';
+    if (userInput != '0') {
+      setState(() {
+        _doelstappen = int.parse(userInput);
+        _doelstappenMetPunt = getalMetPunt(userInput);
+      });
+    }
   }
+
   @override
   void initState() {
     super.initState();
@@ -298,19 +305,32 @@ class _SettingsState extends State<Settings> {
   late int doelstappen;
   bool magDoor = false;
   String doorgeefWaarde = '';
-
+  void slaInvoerop() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('invoer', userInput);
+  }
+  void haalInvoerop() async {
+    final prefs = await SharedPreferences.getInstance();
+    userInput = prefs.getString('invoer') ?? '0';
+    if (userInput != '0') {
+      setState(() {
+        _doelstappen = int.parse(userInput);
+        _doelstappenMetPunt = getalMetPunt(userInput);
+      });
+    }
+  }
   void _toonInvoer() {
     String userInput = _controller.text;
     if (int.tryParse(userInput) != null &&
         int.parse(userInput) >= 1000 &&
         int.parse(userInput) <= 50000) {
-      slaInvoerop();
       _doelstappen = int.parse(userInput);
       magDoor = true;
       doorgeefWaarde = getalMetPunt(userInput);
       setState(() {
         _doelstappenMetPunt = getalMetPunt(userInput);
       });
+      slaInvoerop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Vul een geldig getal tussen 1.000 en 50.000 in'),
