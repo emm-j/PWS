@@ -86,13 +86,21 @@ class _HomePageState extends State<HomePage> {
     final prefs = await SharedPreferences.getInstance();
     _stepOffset = prefs.getInt('stepOffset') ?? 0;
   }
-
+  void slaInvoerop() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('invoer', userInput);
+  }
+  void haalInvoerop() async {
+    final prefs = await SharedPreferences.getInstance();
+    userInput = prefs.getString('invoer') ?? '0';
+  }
   @override
   void initState() {
     super.initState();
     initPlatformState();
     checkAndResetSteps();
     loadOffset();
+    haalInvoerop();
   }
 
   void onStepCount(StepCount event) async {
@@ -296,6 +304,7 @@ class _SettingsState extends State<Settings> {
     if (int.tryParse(userInput) != null &&
         int.parse(userInput) >= 1000 &&
         int.parse(userInput) <= 50000) {
+      slaInvoerop();
       _doelstappen = int.parse(userInput);
       magDoor = true;
       doorgeefWaarde = getalMetPunt(userInput);
