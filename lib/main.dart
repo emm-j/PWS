@@ -5,12 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:cron/cron.dart';
+import 'customlevel.dart';
 
 var mainGroen = const Color.fromRGBO(151, 200, 130, 1);
-int _doelstappen = 0;
-String _doelstappenMetPunt = '0';
-String _doelstappenweergeven = '0';
-String _steps = '0';
+int _doelstappen = 1;
+String _doelstappenMetPunt = '';
+String _doelstappenweergeven = '';
+String _steps = '1';
 String userInput = '0';
 bool magDoor = false;
 int _stepOffset = 0;
@@ -416,6 +417,10 @@ class Levels extends StatefulWidget {
 }
 
 class _LevelsState extends State<Levels> {
+  final List<CustomLevel> pages = [
+    CustomLevel(title: 'Pagina 1', content: 'Dit is pagina 1'),
+    CustomLevel(title: 'Pagina 2', content: 'Dit is pagina 2'),
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -426,11 +431,26 @@ class _LevelsState extends State<Levels> {
             Container(
               height: 60,
             ),
-            for (int i = 0; i < 1000; i += 100)
+            for (int i = 0; i < 7; i += 1000)
               Container(
                 height: 20,
                 decoration: BoxDecoration(color: Colors.amber[i]),
               ),
+            ListView.builder(
+              itemCount: pages.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(pages[index].title),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => pages[index])
+                    );
+                  }
+                );
+              },
+            ),
+
             Spacer(),
 
             Container(
