@@ -7,10 +7,11 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:cron/cron.dart';
 import 'custompopup.dart';
 
-var mainGroen = const Color.fromRGBO(151, 200, 130, 1);
-int _doelstappen = 1;
-String _doelstappenMetPunt = '';
-String _doelstappenweergeven = '';
+var mainGroen = Color.fromRGBO(151, 200, 130, 1);
+var mainOranje = Color.fromRGBO(255, 204, 111, 1);
+int _doelstappen = 0;
+String _doelstappenMetPunt = '10.000';
+String _doelstappenweergeven = '10.000';
 String _steps = '1';
 String userInput = '0';
 bool magDoor = false;
@@ -185,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                         fontSize: 82.0,
                         fontFamily: 'Tekst',
                         fontWeight: FontWeight.w800,
-                        color: Colors.amber),
+                        color: Color.fromRGBO(255, 204, 111, 1)),
                   ),
                 )),
             Padding(
@@ -232,7 +233,7 @@ class _HomePageState extends State<HomePage> {
               width: 65,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
-                color: Colors.amber,
+                color: mainOranje,
               ),
               child: IconButton(
                   icon: const Icon(Icons.add, size: 30),
@@ -266,7 +267,6 @@ class _HomePageState extends State<HomePage> {
                       child: IconButton(
                         onPressed: () {
                           Navigator.pushNamed(context, '/settings');
-                          magDoor = false;
                           },
                         icon: Icon(Icons.settings),
                         iconSize: 50,
@@ -385,6 +385,7 @@ class _SettingsState extends State<Settings> {
                     height: 60,
                     child: IconButton(
                       onPressed: () {
+                        print(_doelstappen);
                         if (_doelstappen >= 1000 && _doelstappen <= 50000) {
                           _doelstappenMetPunt = getalMetPunt(_doelstappen.toString());
                           Navigator.pushNamed(context, '/');
@@ -425,97 +426,67 @@ class Levels extends StatefulWidget {
 }
 
 class _LevelsState extends State<Levels> {
-  List levelgetal = ['test','1','2','3', '4','5','6'];
-  List leveltext = ['test','Dit is level 1', 'Dit is level 2', 'Dit is level 3','Dit is level 4','Dit is level 5','Dit is level 6'];
+  List levelgetal = ['test','1','2','3', '4','5','6','7','8','9','10','11','12'];
+  List leveltext = ['test','Dit is level 1', 'Dit is level 2', 'Dit is level 3','Dit is level 4','Dit is level 5','Dit is level 6','test','test','test','test','test','test','test','test',];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.grey[200],
         body: Column(
           children: [
-            Container(decoration: const BoxDecoration(color: Colors.amber)),
-            Container(
-              height: 60,
+            SizedBox(
+              height: 50
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              for (int index=1; index < 4; index++)
-              Container(
-                height: 100,
-                width: 100,
-                decoration: BoxDecoration(
-                  color: Colors.amber,
-                  borderRadius: BorderRadius.circular(15)
-                ),
-                child: TextButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return CustomPopup(
-                          title: levelgetal[index],
-                          content: leveltext[index],
-                          buttonText: 'Sluiten',
-                          onButtonPressed: () {
-                            print('Popup gesloten!');
-                          },
-                        );
-                      },
-                    );
-                  }, child: Text('$index',
-                  style: TextStyle(
-                    fontFamily: "Tekst",
-                    fontSize: 50,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.grey[800],
-                  ),),
-                ),
-              ),
-    ],
-    ),
-            Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10)
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            Column(
               children: [
-                for (int index=4; index < 7; index++)
-                  Container(
-                    height: 100,
-                    width: 100,
-                    decoration: BoxDecoration(
-                        color: Colors.amber,
-                        borderRadius: BorderRadius.circular(15)
-                    ),
-                    child: TextButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return CustomPopup(
-                              title: levelgetal[index],
-                              content: leveltext[index],
-                              buttonText: 'Sluiten',
-                              onButtonPressed: () {
-                                print('Popup gesloten!');
+                for (int i = 1; i < 7; i++)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      for (int index=((i-1)*3) + 1; index < (((i - 1)*3+3)+1); index++)
+                      Container(
+                        margin: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
+                        height: 100,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          color: mainOranje,
+                          borderRadius: BorderRadius.circular(15)
+                        ),
+                        child: TextButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return CustomPopup(
+                                  title: levelgetal[index],
+                                  content: leveltext[index],
+                                  buttonText: 'Sluiten',
+                                  onButtonPressed: () {
+                                    print('Popup gesloten!');
+                                  },
+                                );
                               },
                             );
                           },
-                        );
-                      }, child: Text('$index',
-                      style: TextStyle(
-                        fontFamily: "Tekst",
-                        fontSize: 50,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.grey[800],
-                      ),),
-                    ),
-                  ),
+                          child: Text('$index',
+                          style: TextStyle(
+                            fontFamily: "Tekst",
+                            fontSize: 50,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.grey[800],
+                          ),),
+                        ),
+                      ),
+                        ],
+                      ),
+
               ],
+
+            ),
+            Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10)
             ),
             Spacer(),
-
             Container(
               height: 80,
               decoration:

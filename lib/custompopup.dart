@@ -50,7 +50,15 @@ class CustomPopup extends StatelessWidget {
               onButtonPressed!();
             }
           },
-          child: Text(buttonText),
+          child: Center(
+            child: Text(buttonText,
+              style: TextStyle(
+              fontFamily: "Tekst",
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[800],
+            ),),
+          ),
         ),
       ],
     );
