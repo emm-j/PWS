@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:cron/cron.dart';
 import 'custompopup.dart';
 
 var mainGroen = Color.fromRGBO(151, 200, 130, 1);
@@ -63,14 +61,14 @@ class _HomePageState extends State<HomePage> {
         DateFormat('yyyy-MM-dd').format(DateTime.now()); // Huidige datum
 
     if (lastResetDate != todayDate) {
-      // Controle of reset nodig is
       resetten(); // Reset stappen
       prefs.setString('lastResetDate', todayDate); // Update de opgeslagen datum
     }
   }
-  void resetten() {
-    _stepOffset = int.parse(_steps) + _stepOffset; // Werk de offset bij
+  void resetten() async {
+     // Werk de offset bij
     setState(() {
+      _stepOffset = int.parse(_steps) + _stepOffset;
       _steps = '0';
       dagelijksevoortgang = 0.0;
     });
@@ -97,10 +95,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   void onStepCount(StepCount event) async {
+    checkAndResetSteps();
+    print(event);
+    print("Offset: $_stepOffset");
     setState(() {
       int rawSteps = event.steps;
       _steps = (rawSteps - _stepOffset).toString();
     });
+    _hogeredagelijksevoortgang();
+    didChangeDependencies();
   }
   void onStepCountError(error) {
     setState(() {
@@ -125,7 +128,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _hogeredagelijksevoortgang() {
-    dagelijksevoortgang = dagelijksestappen / _doelstappen;
+    print(_doelstappen);
+    if (_doelstappen == 0) {
+      setState(() {
+        dagelijksevoortgang = 0.0; // Voortgang kan niet worden berekend
+      });
+      return;
+    }
+    dagelijksevoortgang = int.parse(_steps) / _doelstappen;
+    print(dagelijksevoortgang);
 
     setState(() {
       if (dagelijksevoortgang <= 0.25) {
@@ -423,7 +434,7 @@ class _LevelsState extends State<Levels> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.grey[200],
-        body: Column(
+        body: ListView(
           children: [
             SizedBox(
               height: 50
@@ -538,10 +549,11 @@ getalMetPunt(getal) {
 }
 void haalInvoerop() async {
   final prefs = await SharedPreferences.getInstance();
-  String waarde = prefs.getString('invoer').toString();
-  _doelstappen = int.parse(waarde);
+  int? waarde = prefs.getInt('invoer');
+  _doelstappen = waarde ?? 10000;
+  _doelstappenMetPunt = getalMetPunt(_doelstappen.toString());
 }
 void slaInvoerop() async {
   final prefs = await SharedPreferences.getInstance();
-  await prefs.setString('invoer', userInput);
+  await prefs.setInt('invoer', _doelstappen);
 }
