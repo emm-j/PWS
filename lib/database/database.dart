@@ -4,56 +4,63 @@ import 'package:projecten/data_model/models.dart';
 
 class Doelen {
   final tabelNaam = 'doelen';
+
   Future<void> createTable(Database database) async {
     await database.execute("""CREATE TABLE IF NOT EXISTS $tabelNaam(
-    "id" INTEGER NOT NULL,
-    "title" TEXT NOT NULL,
-    "created_at" INTEGER NOT NULL DEFAULT (cast(strftime('%s','now') as int
-    "updated_at" INTEGER,
-    PRIMARY KEY("id" AUTONCREMENT)
+      level INTEGER PRIMARY KEY,
+      gehaald INTEGER NOT NULL DEFAULT 0
     );""");
   }
 
-  Future<int> create({required String title}) async {
+  Future<int> create({required int level, required bool gehaald}) async {
     final database = await DatabaseService().database;
-    return await database.rawInsert(
-        '''INSERT INTO $tabelNaam (title,created_at) VALUES (?,?)''',
-            [title, DateTime.now().millisecondsSinceEpoch],
+    return await database.insert(
+      tabelNaam,
+      {
+        'level': level,
+        'gehaald': gehaald ? 1 : 0,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace, // Zorgt ervoor dat bestaande records worden overschreven
     );
   }
 
   Future<List<Doel>> fetchAll() async {
     final database = await DatabaseService().database;
     final doelen = await database.rawQuery(
-        """SELECT * from $tabelNaam ORDER BY COALESCE(updated_at,created_at""");
-    return doelen.map((doen) => Doel.fromSqfliteDatabase(doen)).toList();
+      "SELECT * FROM $tabelNaam ORDER BY level ASC",
+    );
+    return doelen.map((doel) => Doel.fromSqfliteDatabase(doel)).toList();
   }
 
-  Future<Doel> fetchById(int id) async {
+  Future<Doel?> fetchByLevel(int level) async {
     final database = await DatabaseService().database;
-    final doel = await database.rawQuery(
-      """SELECT * from $tabelNaam WHERE id = ?""", [id]);
-    return Doel.fromSqfliteDatabase(doel.first);
+    final doelen = await database.query(
+      tabelNaam,
+      where: 'level = ?',
+      whereArgs: [level],
+    );
+    if (doelen.isNotEmpty) {
+      return Doel.fromSqfliteDatabase(doelen.first);
+    }
+    return null;
   }
 
-  Future<int> update({required int id, String? title}) async {
+  Future<int> update({required int level, required bool gehaald}) async {
     final database = await DatabaseService().database;
     return await database.update(
-        tabelNaam,
-        {
-            if (title != null) 'title': title,
-            'updated_at': DateTime.now().millisecondsSinceEpoch,
-          },
-        where: 'id = ?',
-        conflictAlgorithm: ConflictAlgorithm.rollback,
-        whereArgs: [id],
+      tabelNaam,
+      {'gehaald': gehaald ? 1 : 0},
+      where: 'level = ?',
+      whereArgs: [level],
     );
   }
 
-  Future<void> delete(int id) async {
+  Future<void> delete(int level) async {
     final database = await DatabaseService().database;
-    await database.rawDelete('''DELETE FROM $tabelNaam WHERE id = ?''', [id]);
+    await database.delete(
+      tabelNaam,
+      where: 'level = ?',
+      whereArgs: [level],
+    );
   }
-
 }
-

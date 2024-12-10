@@ -1,12 +1,17 @@
 class Doel {
-  final int stappen;
-  final DateTime updatetijd;
+  final int level;
+  final bool gehaald;
   Doel({
-    required this.stappen,
-    required this.updatetijd,
+    required this.level,
+    required this.gehaald,
   });
   factory Doel.fromSqfliteDatabase(Map<String, dynamic> map) => Doel(
-    stappen: map['stappen']?.toInt() ?? 0,
-    updatetijd: DateTime.now(),
+    level: map['level'] as int,
+    gehaald: (map['gehaald'] as int) == 1,
   );
+
+  Map<String, dynamic> toMap() => {
+    'level': level,
+    'gehaald': gehaald ? 1 : 0,
+  };
 }
