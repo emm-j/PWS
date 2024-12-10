@@ -489,37 +489,39 @@ class _LevelsState extends State<Levels> {
                 padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10)
             ),
             Spacer(),
-            Container(
-              height: 80,
-              decoration:
-                  BoxDecoration(color: Color.fromRGBO(151, 200, 130, 1)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Container(
-                    height: 60,
-                      child: IconButton(
-                          onPressed: () {}, icon: Icon(Icons.grid_view_rounded, color: Colors.grey[100]),
-                        iconSize: 50
-                        ,
-                      )),
-                  Container(
-                      height: 60,
-                      child: IconButton(
-                        onPressed: () {Navigator.pushNamed(context, '/');}, icon: Icon(Icons.home),
-                        iconSize: 50,
-                      )),
-                  Container(
-                      height: 60,
-                      child: IconButton(
-                        onPressed: () {Navigator.pushNamed(context, '/settings');}, icon: Icon(Icons.settings),
-                        iconSize: 50,
-                      )),
-                ],
-              ),
-            ),
           ],
-        ));
+        ),
+        bottomNavigationBar: Container(
+            height: 80,
+            decoration:
+            BoxDecoration(color: Color.fromRGBO(151, 200, 130, 1)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Container(
+                    height: 60,
+                    child: IconButton(
+                      onPressed: () {}, icon: Icon(Icons.grid_view_rounded, color: Colors.grey[100]),
+                      iconSize: 50
+                      ,
+                    )),
+                Container(
+                    height: 60,
+                    child: IconButton(
+                      onPressed: () {Navigator.pushNamed(context, '/');}, icon: Icon(Icons.home),
+                      iconSize: 50,
+                    )),
+                Container(
+                    height: 60,
+                    child: IconButton(
+                      onPressed: () {Navigator.pushNamed(context, '/settings');}, icon: Icon(Icons.settings),
+                      iconSize: 50,
+                    )),
+              ],
+            ),
+          ),
+    );
+
   }
 }
 
