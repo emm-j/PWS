@@ -6,7 +6,11 @@ import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:cron/cron.dart';
 import 'custompopup.dart';
+import 'database/database_service.dart'; // Importeer database services
+import 'database/database.dart'; // Importeer SQLite helpers
+import 'data_model/models.dart'; // Importeer de modellen
 
+late Doelen doelenService; // Service voor de doelen
 var mainGroen = const Color.fromRGBO(151, 200, 130, 1);
 int _doelstappen = 1;
 String _doelstappenMetPunt = '';
@@ -17,7 +21,7 @@ bool magDoor = false;
 int _stepOffset = 0;
 List levels = [];
 
-void main() {
+void main() async {
   runApp(const MyApp());
 }
 
@@ -427,6 +431,24 @@ class Levels extends StatefulWidget {
 class _LevelsState extends State<Levels> {
   List levelgetal = ['test','1','2','3', '4','5','6'];
   List leveltext = ['test','Dit is level 1', 'Dit is level 2', 'Dit is level 3','Dit is level 4','Dit is level 5','Dit is level 6'];
+
+  @override
+  void initState() {
+    super.initState();
+    _updateDatabaseWithLevels();
+  }
+
+  Future<void> _updateDatabaseWithLevels() async {
+    final database = await DatabaseService().database;
+    await doelenService.createTable(database);
+
+    for (int i = 1; i < levelgetal.length; i++) {
+      final bestaandLevel = await doelenService.fetchByLevel(int.parse(levelgetal[i]));
+      if (bestaandLevel == null) {
+        await doelenService.create(level: int.parse(levelgetal[i]), gehaald: false);
+      }
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
