@@ -51,7 +51,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late Stream<StepCount> _stepCountStream;
   var kleur = mainGroen;
-  final cron = Cron();
   late int dagelijksestappen = int.parse(_steps);
   double dagelijksevoortgang = 0.0;
 
@@ -87,11 +86,7 @@ class _HomePageState extends State<HomePage> {
     final prefs = await SharedPreferences.getInstance();
     _stepOffset = prefs.getInt('stepOffset') ?? 0;
   }
-  void haalInvoerop() async {
-    final prefs = await SharedPreferences.getInstance();
-    String waarde = prefs.getString('invoer').toString();
-    _doelstappen = int.parse(waarde);
-  }
+
   @override
   void initState() {
     super.initState();
@@ -293,10 +288,6 @@ class _SettingsState extends State<Settings> {
   bool magDoor = false;
   String doorgeefWaarde = '';
 
-  void slaInvoerop() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('invoer', userInput);
-  }
 
   void _toonInvoer() {
     String userInput = _controller.text;
@@ -544,4 +535,13 @@ getalMetPunt(getal) {
   String _getalMetPunt = formatter.format(int.parse(getal));
 
   return _getalMetPunt;
+}
+void haalInvoerop() async {
+  final prefs = await SharedPreferences.getInstance();
+  String waarde = prefs.getString('invoer').toString();
+  _doelstappen = int.parse(waarde);
+}
+void slaInvoerop() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('invoer', userInput);
 }
