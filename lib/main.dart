@@ -72,7 +72,6 @@ class _HomePageState extends State<HomePage> {
     _stepOffset = int.parse(_steps) + _stepOffset; // Werk de offset bij
     setState(() {
       _steps = '0';
-      dagelijksevoortgang = 0.0;
     });
     saveOffset(); // Sla de nieuwe offset op
   }
