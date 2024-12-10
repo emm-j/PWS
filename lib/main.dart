@@ -425,6 +425,8 @@ class Levels extends StatefulWidget {
 }
 
 class _LevelsState extends State<Levels> {
+  List levelgetal = ['test','1','2','3', '4','5','6'];
+  List leveltext = ['test','Dit is level 1', 'Dit is level 2', 'Dit is level 3','Dit is level 4','Dit is level 5','Dit is level 6'];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -435,33 +437,82 @@ class _LevelsState extends State<Levels> {
             Container(
               height: 60,
             ),
-            for (int i = 0; i < 7; i += 1000)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              for (int index=1; index < 4; index++)
               Container(
-                height: 20,
-                decoration: BoxDecoration(color: Colors.amber[i]),
-              ),
-            Container(
-              height:50,
-              decoration: BoxDecoration(
-                color: Colors.amber
-              ),
-              child: IconButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return CustomPopup(
-                        title: 'Welkom!',
-                        content: 'Dit is een herbruikbare popup.',
-                        buttonText: 'Sluiten',
-                        onButtonPressed: () {
+                height: 100,
+                width: 100,
+                decoration: BoxDecoration(
+                  color: Colors.amber,
+                  borderRadius: BorderRadius.circular(15)
+                ),
+                child: TextButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return CustomPopup(
+                          title: levelgetal[index],
+                          content: leveltext[index],
+                          buttonText: 'Sluiten',
+                          onButtonPressed: () {
                             print('Popup gesloten!');
-                        },
-                      );
-                    },
-                  );
-                }, icon: Icon(Icons.one_x_mobiledata),
+                          },
+                        );
+                      },
+                    );
+                  }, child: Text('$index',
+                  style: TextStyle(
+                    fontFamily: "Tekst",
+                    fontSize: 50,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.grey[800],
+                  ),),
+                ),
               ),
+    ],
+    ),
+            Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10)
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                for (int index=4; index < 7; index++)
+                  Container(
+                    height: 100,
+                    width: 100,
+                    decoration: BoxDecoration(
+                        color: Colors.amber,
+                        borderRadius: BorderRadius.circular(15)
+                    ),
+                    child: TextButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return CustomPopup(
+                              title: levelgetal[index],
+                              content: leveltext[index],
+                              buttonText: 'Sluiten',
+                              onButtonPressed: () {
+                                print('Popup gesloten!');
+                              },
+                            );
+                          },
+                        );
+                      }, child: Text('$index',
+                      style: TextStyle(
+                        fontFamily: "Tekst",
+                        fontSize: 50,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.grey[800],
+                      ),),
+                    ),
+                  ),
+              ],
             ),
             Spacer(),
 

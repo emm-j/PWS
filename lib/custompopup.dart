@@ -18,8 +18,30 @@ class CustomPopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(title),
-      content: Text(content),
+      backgroundColor: Colors.amber[100],
+      title: Center(
+        child: Text(
+          title,
+          style: TextStyle(
+          fontFamily: "Tekst",
+          fontSize: 50,
+          fontWeight: FontWeight.w800,
+          color: Colors.grey[800],
+        ),
+        ),
+      ),
+      content: SizedBox(
+        height: 700,
+         width: 500,
+         child: Text(content,
+           style: TextStyle(
+           fontFamily: "Tekst",
+           fontSize: 20,
+           fontWeight: FontWeight.w400,
+           color: Colors.grey[800],
+         ),
+         ),
+      ),
       actions: [
         TextButton(
           onPressed: () {
