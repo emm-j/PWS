@@ -92,7 +92,8 @@ class _HomePageState extends State<HomePage> {
   }
   void haalInvoerop() async {
     final prefs = await SharedPreferences.getInstance();
-    userInput = prefs.getString('invoer') ?? '0';
+    String waarde = prefs.getString('invoer').toString();
+    _doelstappen = int.parse(waarde);
   }
   @override
   void initState() {
