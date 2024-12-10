@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:cron/cron.dart';
-import 'customlevel.dart';
+import 'custompopup.dart';
 
 var mainGroen = const Color.fromRGBO(151, 200, 130, 1);
 int _doelstappen = 1;
@@ -86,10 +86,6 @@ class _HomePageState extends State<HomePage> {
     final prefs = await SharedPreferences.getInstance();
     _stepOffset = prefs.getInt('stepOffset') ?? 0;
   }
-  void slaInvoerop() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('invoer', userInput);
-  }
   void haalInvoerop() async {
     final prefs = await SharedPreferences.getInstance();
     String waarde = prefs.getString('invoer').toString();
@@ -111,9 +107,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
   void onStepCountError(error) {
-    print('onStepCountError: $error');
     setState(() {
-      print('Step Count not available');
     });
   }
   Future<bool> _checkActivityRecognitionPermission() async {
@@ -129,7 +123,6 @@ class _HomePageState extends State<HomePage> {
   Future<void> initPlatformState() async {
     bool granted = await _checkActivityRecognitionPermission();
     if (!granted) {
-      print('geen toestemming');
     }
     _stepCountStream = Pedometer.stepCountStream;
     _stepCountStream.listen(onStepCount).onError(onStepCountError);
@@ -162,6 +155,7 @@ class _HomePageState extends State<HomePage> {
       _doelstappenweergeven = _doelstappenMetPunt;
     });
   }
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _updateDoelstappen();
@@ -271,7 +265,6 @@ class _HomePageState extends State<HomePage> {
                       height: 60,
                       child: IconButton(
                         onPressed: () {
-                          print(_doelstappenMetPunt);
                           Navigator.pushNamed(context, '/settings');
                           magDoor = false;
                           },
@@ -300,18 +293,23 @@ class _SettingsState extends State<Settings> {
   bool magDoor = false;
   String doorgeefWaarde = '';
 
+  void slaInvoerop() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('invoer', userInput);
+  }
+
   void _toonInvoer() {
     String userInput = _controller.text;
     if (int.tryParse(userInput) != null &&
         int.parse(userInput) >= 1000 &&
         int.parse(userInput) <= 50000) {
-      slaInvoerop();
-      _doelstappen = int.parse(userInput);
-      magDoor = true;
-      doorgeefWaarde = getalMetPunt(userInput);
-      setState(() {
-        _doelstappenMetPunt = getalMetPunt(userInput);
-      });
+        slaInvoerop();
+        _doelstappen = int.parse(userInput);
+        magDoor = true;
+        doorgeefWaarde = getalMetPunt(userInput);
+        setState(() {
+          _doelstappenMetPunt = getalMetPunt(userInput);
+        });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Vul een geldig getal tussen 1.000 en 50.000 in'),
@@ -427,10 +425,6 @@ class Levels extends StatefulWidget {
 }
 
 class _LevelsState extends State<Levels> {
-  final List<CustomLevel> pages = [
-    CustomLevel(title: 'Pagina 1', content: 'Dit is pagina 1'),
-    CustomLevel(title: 'Pagina 2', content: 'Dit is pagina 2'),
-  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -446,21 +440,29 @@ class _LevelsState extends State<Levels> {
                 height: 20,
                 decoration: BoxDecoration(color: Colors.amber[i]),
               ),
-            ListView.builder(
-              itemCount: pages.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(pages[index].title),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => pages[index])
-                    );
-                  }
-                );
-              },
+            Container(
+              height:50,
+              decoration: BoxDecoration(
+                color: Colors.amber
+              ),
+              child: IconButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return CustomPopup(
+                        title: 'Welkom!',
+                        content: 'Dit is een herbruikbare popup.',
+                        buttonText: 'Sluiten',
+                        onButtonPressed: () {
+                            print('Popup gesloten!');
+                        },
+                      );
+                    },
+                  );
+                }, icon: Icon(Icons.one_x_mobiledata),
+              ),
             ),
-
             Spacer(),
 
             Container(
