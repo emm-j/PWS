@@ -8,8 +8,11 @@ import 'custompopup.dart';
 var mainGroen = Color.fromRGBO(151, 200, 130, 1);
 var mainOranje = Color.fromRGBO(255, 204, 111, 1);
 int _doelstappen = 0;
+int _volgenddoel = 100000;
 String _doelstappenMetPunt = '10.000';
+String _volgenddoelMetPunt = '100.000';
 String _doelstappenweergeven = '10.000';
+String _volgenddoelweergeven = '10.000';
 String _steps = '1';
 String userInput = '0';
 bool magDoor = false;
@@ -51,6 +54,7 @@ class _HomePageState extends State<HomePage> {
   var kleur = mainGroen;
   late int dagelijksestappen = int.parse(_steps);
   double dagelijksevoortgang = 0.0;
+  double voortgangsindsdoel = 0.0;
 
   void checkAndResetSteps() async {
     final prefs = await SharedPreferences.getInstance();
@@ -103,6 +107,7 @@ class _HomePageState extends State<HomePage> {
       _steps = (rawSteps - _stepOffset).toString();
     });
     _hogeredagelijksevoortgang();
+    _hogerevoortgangsindsdoel();
     didChangeDependencies();
   }
   void onStepCountError(error) {
@@ -157,15 +162,52 @@ class _HomePageState extends State<HomePage> {
         });
       }
     });    }
+
+  void _hogerevoortgangsindsdoel() {
+    if (_volgenddoel == 0) {
+      setState(() {
+        voortgangsindsdoel = 0.0; // Voortgang kan niet worden berekend
+      });
+      return;
+    }
+    voortgangsindsdoel = (int.parse(_steps) + _stepOffset) / _volgenddoel;
+    print(voortgangsindsdoel);
+
+    setState(() {
+      if (voortgangsindsdoel <= 0.25) {
+        setState(() {
+          kleur = const Color.fromRGBO(255, 28, 0, 1);
+        });
+      } else if (voortgangsindsdoel >= 0.25 && voortgangsindsdoel <= 0.61) {
+        setState(() {
+          kleur = const Color.fromRGBO(255, 181, 0, 1);
+        });
+      } else if (voortgangsindsdoel >= 0.61 && voortgangsindsdoel < 1) {
+        setState(() {
+          kleur = const Color.fromRGBO(151, 200, 130, 1);
+        });
+      } else if (voortgangsindsdoel >= 1) {
+        setState(() {
+          kleur = const Color.fromRGBO(22, 143, 28, 1);
+        });
+      }
+    });    }
   void _updateDoelstappen() {
     setState(() {
       _doelstappenweergeven = _doelstappenMetPunt;
+    });
+  }
+  void _updateVolgenddoel() {
+    setState(() {
+      _volgenddoelMetPunt = getalMetPunt(_volgenddoel.toString());
+      _volgenddoelweergeven = _volgenddoelMetPunt;
     });
   }
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _updateDoelstappen();
+    _updateVolgenddoel();
   }
 
 
@@ -184,12 +226,12 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             Padding(
                 padding:
-                    const EdgeInsetsDirectional.fromSTEB(30, 150, 30, 0),
+                    const EdgeInsetsDirectional.fromSTEB(30, 30, 30, 0),
                 child: Center(
                   child: Text(
                     _steps,
                     style: const TextStyle(
-                        fontSize: 82.0,
+                        fontSize: 65.0,
                         fontFamily: 'Tekst',
                         fontWeight: FontWeight.w800,
                         color: Color.fromRGBO(255, 204, 111, 1)),
@@ -197,16 +239,16 @@ class _HomePageState extends State<HomePage> {
                 )),
             Padding(
                 padding:
-                    const EdgeInsetsDirectional.fromSTEB(30, 15, 30, 20),
+                    const EdgeInsetsDirectional.fromSTEB(30, 8, 30, 20),
                 child: Center(
                     child: Text('stappen vandaag gezet',
                         style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 15,
                             fontFamily: 'Tekst',
                             fontWeight: FontWeight.w800,
                             color: Colors.grey[800])))),
             Padding(
-                padding: const EdgeInsetsDirectional.all(20.0),
+                padding: const EdgeInsetsDirectional.all(10.0),
                 child: Center(
                     child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
@@ -223,29 +265,68 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(
                         fontFamily: "Tekst",
                         color: Colors.grey[800],
-                        fontSize: 20,
+                        fontSize: 15,
                         fontWeight: FontWeight.w800)),
                 const Padding(padding: EdgeInsets.only(left: 250)),
                 Text("$_doelstappenweergeven",
                     style: TextStyle(
                         fontFamily: "Tekst",
                         color: Colors.grey[800],
-                        fontSize: 20,
+                        fontSize: 15,
                         fontWeight: FontWeight.w800))
               ],
             ),
-            Container(
-              height: 65,
-              width: 65,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: mainOranje,
-              ),
-              child: IconButton(
-                  icon: const Icon(Icons.add, size: 30),
-                  onPressed: () {
-                    _hogeredagelijksevoortgang();
-                  }),
+            Padding(
+                padding:
+                const EdgeInsetsDirectional.fromSTEB(30, 30, 30, 0),
+                child: Center(
+                  child: Text(
+                    (int.parse(_steps) + _stepOffset).toString(),
+                    style: const TextStyle(
+                        fontSize: 65.0,
+                        fontFamily: 'Tekst',
+                        fontWeight: FontWeight.w800,
+                        color: Color.fromRGBO(255, 204, 111, 1)),
+                  ),
+                )),
+            Padding(
+                padding:
+                const EdgeInsetsDirectional.fromSTEB(30, 8, 30, 20),
+                child: Center(
+                    child: Text('stappen sinds vorige uitdaging',
+                        style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'Tekst',
+                            fontWeight: FontWeight.w800,
+                            color: Colors.grey[800])))),
+            Padding(
+                padding: const EdgeInsetsDirectional.all(10.0),
+                child: Center(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: LinearProgressIndicator(
+                        value: voortgangsindsdoel,
+                        valueColor: AlwaysStoppedAnimation(kleur),
+                        minHeight: 30,
+                      ),
+                    ))),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text("0",
+                    style: TextStyle(
+                        fontFamily: "Tekst",
+                        color: Colors.grey[800],
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800)),
+                const Padding(padding: EdgeInsets.only(left: 250)),
+                Text("$_volgenddoelweergeven",
+                    style: TextStyle(
+                        fontFamily: "Tekst",
+                        color: Colors.grey[800],
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800))
+              ],
             ),
             Spacer(),
             Container(
