@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+List gehaaldeDoelen = [1,2,3,4,5];
 
 class CustomPopup extends StatelessWidget {
   final String title;
   final String content;
   final String buttonText;
+  final int index;
+  final String knopText;
 
   final VoidCallback? onButtonPressed;
 
@@ -11,6 +14,8 @@ class CustomPopup extends StatelessWidget {
     Key? key,
     required this.title,
     required this.content,
+    required this.index,
+    required this.knopText,
     this.buttonText = 'OK',
     this.onButtonPressed,
   }) : super(key: key);
@@ -33,13 +38,29 @@ class CustomPopup extends StatelessWidget {
       content: SizedBox(
         height: 700,
          width: 500,
-         child: Text(content,
-           style: TextStyle(
-           fontFamily: "Tekst",
-           fontSize: 20,
-           fontWeight: FontWeight.w400,
-           color: Colors.grey[800],
-         ),
+         child: Column(
+           children: [
+             Text(content,
+               style: TextStyle(
+               fontFamily: "Tekst",
+               fontSize: 20,
+               fontWeight: FontWeight.w400,
+               color: Colors.grey[800],
+             ),
+             ),
+             TextButton(onPressed: () {
+               if (index == gehaaldeDoelen.length) {
+                 gehaaldeDoelen.add(index);
+                 print(gehaaldeDoelen);
+               }
+               else if (index < gehaaldeDoelen.length) {
+
+               }
+               else {
+                 print('niks');
+               }
+             }, child: Text('$knopText'))
+           ],
          ),
       ),
       actions: [

@@ -9,15 +9,16 @@ var mainGroen = Color.fromRGBO(151, 200, 130, 1);
 var mainOranje = Color.fromRGBO(255, 204, 111, 1);
 int _doelstappen = 0;
 int _volgenddoel = 100000;
-String _doelstappenMetPunt = '10.000';
+String _doelstappenMetPunt = '0';
 String _volgenddoelMetPunt = '100.000';
-String _doelstappenweergeven = '10.000';
-String _volgenddoelweergeven = '10.000';
+String _doelstappenweergeven = '0';
+String _volgenddoelweergeven = '0';
 String _steps = '1';
 String userInput = '0';
 bool magDoor = false;
 int _stepOffset = 0;
 List levels = [];
+List gehaaldeDoelen = ['1','2','3','4','5'];
 
 void main() {
   runApp(const MyApp());
@@ -522,7 +523,7 @@ class _LevelsState extends State<Levels> {
             ),
             Column(
               children: [
-                for (int i = 1; i < 7; i++)
+                for (int i = 1; i < 10; i++)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -532,24 +533,42 @@ class _LevelsState extends State<Levels> {
                         height: 100,
                         width: 100,
                         decoration: BoxDecoration(
-                          color: mainOranje,
-                          borderRadius: BorderRadius.circular(15)
+                          color: index == gehaaldeDoelen.length + 1
+                              ? mainOranje
+                              : (index > gehaaldeDoelen.length + 1
+                              ? Color.fromRGBO(255, 56, 112, 0.8)
+                              : mainGroen),
+                          borderRadius: BorderRadius.circular(15),
                         ),
                         child: TextButton(
                           onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return CustomPopup(
-                                  title: levelgetal[index],
-                                  content: leveltext[index],
-                                  buttonText: 'Sluiten',
-                                  onButtonPressed: () {
-                                    print('Popup gesloten!');
-                                  },
-                                );
-                              },
-                            );
+                            if (index <= gehaaldeDoelen.length + 1) {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return CustomPopup(
+                                    title: levelgetal[index],
+                                    content: leveltext[index],
+                                    index: index,
+                                    knopText: index == gehaaldeDoelen.length + 1
+                                        ? 'Voltooien'
+                                        : (index < gehaaldeDoelen.length + 1
+                                        ? 'Voltooid'
+                                        : 'Standaard Knop'),
+                                    buttonText: 'Sluiten',
+                                    onButtonPressed: () {
+                                      print('Popup gesloten!');
+                                    },
+                                  );
+                                },
+                              );
+                            }
+                            else {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                content: Text('Complete eerst het level hiervoor'),
+                                backgroundColor: Colors.redAccent,
+                              ));
+                            }
                           },
                           child: Text('$index',
                           style: TextStyle(
