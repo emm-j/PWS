@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
-List gehaaldeDoelen = [1,2,3,4,5];
+import 'dart:ffi';
 
-class CustomPopup extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'gedeeldelijsten.dart';
+
+class CustomPopup extends StatefulWidget {
   final String title;
   final String content;
   final String buttonText;
@@ -21,12 +23,31 @@ class CustomPopup extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<CustomPopup> createState() => _CustomPopupState();
+}
+
+class _CustomPopupState extends State<CustomPopup> {
+  late String currentKnopText;
+  late int currentIndex;
+
+  void initState() {
+    super.initState();
+    currentKnopText = widget.knopText;
+    currentIndex = widget.index;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    var achtergrondkleur = currentIndex == gehaaldeDoelen.length + 1
+        ? Colors.amber[100]
+        : (currentIndex < gehaaldeDoelen.length + 1
+        ? Colors.green[100]
+        : Colors.red[100]);
     return AlertDialog(
-      backgroundColor: Colors.amber[100],
+      backgroundColor: achtergrondkleur,
       title: Center(
         child: Text(
-          title,
+          widget.title,
           style: TextStyle(
           fontFamily: "Tekst",
           fontSize: 50,
@@ -40,7 +61,7 @@ class CustomPopup extends StatelessWidget {
          width: 500,
          child: Column(
            children: [
-             Text(content,
+             Text(widget.content,
                style: TextStyle(
                fontFamily: "Tekst",
                fontSize: 20,
@@ -49,17 +70,20 @@ class CustomPopup extends StatelessWidget {
              ),
              ),
              TextButton(onPressed: () {
-               if (index == gehaaldeDoelen.length) {
-                 gehaaldeDoelen.add(index);
-                 print(gehaaldeDoelen);
+               if (widget.index == gehaaldeDoelen.length + 1) {
+                 gehaaldeDoelen.add(widget.index);
+                 setState(() {
+                   currentKnopText = 'Voltooid';
+                   achtergrondkleur = Colors.green[100];
+                 });
                }
-               else if (index < gehaaldeDoelen.length) {
+               else if (widget.index < gehaaldeDoelen.length) {
 
                }
                else {
                  print('niks');
                }
-             }, child: Text('$knopText'))
+             }, child: Text('$currentKnopText'))
            ],
          ),
       ),
@@ -67,12 +91,12 @@ class CustomPopup extends StatelessWidget {
         TextButton(
           onPressed: () {
             Navigator.of(context).pop(); // Sluit de popup
-            if (onButtonPressed != null) {
-              onButtonPressed!();
+            if (widget.onButtonPressed != null) {
+              widget.onButtonPressed!();
             }
           },
           child: Center(
-            child: Text(buttonText,
+            child: Text(widget.buttonText,
               style: TextStyle(
               fontFamily: "Tekst",
               fontSize: 20,

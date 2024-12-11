@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'custompopup.dart';
+import 'gedeeldelijsten.dart';
 
 var mainGroen = Color.fromRGBO(151, 200, 130, 1);
 var mainOranje = Color.fromRGBO(255, 204, 111, 1);
@@ -18,7 +19,6 @@ String userInput = '0';
 bool magDoor = false;
 int _stepOffset = 0;
 List levels = [];
-List gehaaldeDoelen = ['1','2','3','4','5'];
 
 void main() {
   runApp(const MyApp());
@@ -420,7 +420,7 @@ class _SettingsState extends State<Settings> {
                     labelStyle: TextStyle(
                       fontFamily: "Tekst",
                       fontSize: 30,
-                    ), // Labeltekst
+                    ),
                     hintText:
                         'Kies tussen 1.000 en 50.000', // Plaatshoudertekst
                     border: OutlineInputBorder()),
@@ -557,7 +557,10 @@ class _LevelsState extends State<Levels> {
                                         : 'Standaard Knop'),
                                     buttonText: 'Sluiten',
                                     onButtonPressed: () {
-                                      print('Popup gesloten!');
+                                        setState(() {
+                                          gehaaldeDoelen.add(index);
+                                          gehaaldeDoelen.remove(index);
+                                        });
                                     },
                                   );
                                 },
