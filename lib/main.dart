@@ -9,9 +9,9 @@ import 'gedeeldelijsten.dart';
 var mainGroen = Color.fromRGBO(151, 200, 130, 1);
 var mainOranje = Color.fromRGBO(255, 204, 111, 1);
 int _doelstappen = 0;
-int _volgenddoel = 100000;
+int _volgenddoel = 500;
 String _doelstappenMetPunt = '0';
-String _volgenddoelMetPunt = '100.000';
+String _volgenddoelMetPunt = '0';
 String _doelstappenweergeven = '0';
 String _volgenddoelweergeven = '0';
 String totalSteps = '0';
@@ -54,6 +54,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late Stream<StepCount> _stepCountStream;
   var kleur = mainGroen;
+  var kleur2 = mainGroen;
   late int dagelijksestappen = int.parse(_steps);
   double dagelijksevoortgang = 0.0;
   double voortgangsindsdoel = 0.0;
@@ -99,15 +100,12 @@ class _HomePageState extends State<HomePage> {
     loadOffset();
     loadStappen();
     haalInvoerop();
+    didChangeDependencies();
   }
 
-  double previousAcceleration = 0.0; // Houd de vorige acceleratie bij
-
-  double lowPassFilter(double input, double previousOutput, double alpha) {
-    return alpha * input + (1 - alpha) * previousOutput;
-  }
   void onStepCount(StepCount event) async {
     checkAndResetSteps();
+    loadStappen();
     if (int.parse(_steps) <= 0) {
       _stepOffset = 0;
       saveOffset();
@@ -185,25 +183,25 @@ class _HomePageState extends State<HomePage> {
       });
       return;
     }
-    voortgangsindsdoel = (int.parse(_steps) + _stepOffset) / _volgenddoel;
+    voortgangsindsdoel = int.parse(totalSteps) / _volgenddoel;
     print(voortgangsindsdoel);
 
     setState(() {
       if (voortgangsindsdoel <= 0.25) {
         setState(() {
-          kleur = const Color.fromRGBO(255, 28, 0, 1);
+          kleur2 = const Color.fromRGBO(255, 28, 0, 1);
         });
       } else if (voortgangsindsdoel >= 0.25 && voortgangsindsdoel <= 0.61) {
         setState(() {
-          kleur = const Color.fromRGBO(255, 181, 0, 1);
+          kleur2 = const Color.fromRGBO(255, 181, 0, 1);
         });
       } else if (voortgangsindsdoel >= 0.61 && voortgangsindsdoel < 1) {
         setState(() {
-          kleur = const Color.fromRGBO(151, 200, 130, 1);
+          kleur2 = const Color.fromRGBO(151, 200, 130, 1);
         });
       } else if (voortgangsindsdoel >= 1) {
         setState(() {
-          kleur = const Color.fromRGBO(22, 143, 28, 1);
+          kleur2 = const Color.fromRGBO(22, 143, 28, 1);
         });
       }
     });    }
@@ -321,7 +319,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(20),
                       child: LinearProgressIndicator(
                         value: voortgangsindsdoel,
-                        valueColor: AlwaysStoppedAnimation(kleur),
+                        valueColor: AlwaysStoppedAnimation(kleur2),
                         minHeight: 30,
                       ),
                     ))),
@@ -524,8 +522,48 @@ class Levels extends StatefulWidget {
 }
 
 class _LevelsState extends State<Levels> {
-  List levelgetal = ['test','1','2','3', '4','5','6','7','8','9','10','11','12'];
-  List leveltext = ['test','Dit is level 1', 'Dit is level 2', 'Dit is level 3','Dit is level 4','Dit is level 5','Dit is level 6','test','test','test','test','test','test','test','test',];
+  void saveLijst() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('gehaald', gehaaldeDoelen);
+  }
+
+  void loadLijst() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      gehaaldeDoelen = prefs.getStringList('gehaald')!;
+    });
+  }
+
+  void resetLijst() async {
+    gehaaldeDoelen = [];
+    saveLijst();
+  }
+  List levelgetal = ['test','1','2','3', '4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20'];
+  List leveltext = ['test',"Loop 1000 stappen binnen 15 minuten.",
+    "Loop 1500 stappen binnen 20 minuten.",
+    "Loop 2000 stappen binnen 25 minuten.",
+    "Loop 2500 stappen binnen 30 minuten.",
+    "Loop 3000 stappen binnen 35 minuten.",
+    "Loop 3500 stappen binnen 40 minuten.",
+    "Loop 4000 stappen binnen 45 minuten.",
+    "Loop 4500 stappen binnen 50 minuten.",
+    "Loop 5000 stappen binnen 55 minuten.",
+    "Loop 5500 stappen binnen 60 minuten.",
+    "Loop 6000 stappen binnen 65 minuten.",
+    "Loop 7000 stappen binnen 75 minuten.",
+    "Loop 8000 stappen binnen 85 minuten.",
+    "Loop 10000 stappen binnen 100 minuten.",
+    "Loop 12000 stappen binnen 120 minuten.",
+    "Loop 13000 stappen binnen 130 minuten.",
+    "Loop 14000 stappen binnen 140 minuten.",
+    "Loop 15000 stappen binnen 150 minuten.",
+    "Loop 20000 stappen binnen 120 minuten.",
+    "Loop 42.195 km binnen 5 uur (300 minuten)."];
+  @override
+  void initState() {
+    super.initState();
+    loadLijst();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -537,53 +575,104 @@ class _LevelsState extends State<Levels> {
             ),
             Column(
               children: [
-                for (int i = 1; i < 10; i++)
+                for (int i = 1; i < 8; i++)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      for (int index=((i-1)*3) + 1; index < (((i - 1)*3+3)+1); index++)
+                      for (int index=((i-1)*3) + 1; index < (((i - 1)*3+3)+1) && index != 21; index++)
                       Container(
                         margin: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
                         height: 100,
                         width: 100,
                         decoration: BoxDecoration(
-                          color: index == gehaaldeDoelen.length + 1
+                          color: index == gehaaldeDoelen.length + 1 && int.parse(totalSteps) >= _volgenddoel
                               ? mainOranje
-                              : (index > gehaaldeDoelen.length + 1
+                              : (index < gehaaldeDoelen.length + 1
+                              ? mainGroen
+                              : index == gehaaldeDoelen.length + 1 && int.parse(totalSteps) < _volgenddoel
                               ? Color.fromRGBO(255, 56, 112, 0.8)
-                              : mainGroen),
+                              : Color.fromRGBO(255, 56, 112, 0.8)),
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: TextButton(
                           onPressed: () {
-                            if (index <= gehaaldeDoelen.length + 1) {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return CustomPopup(
-                                    title: levelgetal[index],
-                                    content: leveltext[index],
-                                    index: index,
-                                    knopText: index == gehaaldeDoelen.length + 1
-                                        ? 'Voltooien'
-                                        : (index < gehaaldeDoelen.length + 1
-                                        ? 'Voltooid'
-                                        : 'Standaard Knop'),
-                                    buttonText: 'Sluiten',
-                                    onButtonPressed: () {
+                            if (int.parse(totalSteps) >= _volgenddoel) {
+                              if (index <= gehaaldeDoelen.length + 1) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return CustomPopup(
+                                      title: levelgetal[index],
+                                      content: leveltext[index],
+                                      index: index,
+                                      knopText: index ==
+                                          gehaaldeDoelen.length + 1
+                                          ? 'Voltooien'
+                                          : (index < gehaaldeDoelen.length + 1
+                                          ? 'Voltooid'
+                                          : 'Standaard Knop'),
+                                      buttonText: 'Sluiten',
+                                      onButtonPressed: () {
                                         setState(() {
-                                          Navigator.pushNamed(context, '/levels');
+                                          Navigator.pushNamed(
+                                              context, '/levels');
                                         });
-                                    },
-                                  );
-                                },
-                              );
+                                      },
+                                    );
+                                  },
+                                );
+                              }
+                              else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Complete eerst het level hiervoor'),
+                                      backgroundColor: Colors.redAccent,
+                                    ));
+                              }
                             }
                             else {
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                content: Text('Complete eerst het level hiervoor'),
-                                backgroundColor: Colors.redAccent,
-                              ));
+                              if (index < gehaaldeDoelen.length + 1) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return CustomPopup(
+                                      title: levelgetal[index],
+                                      content: leveltext[index],
+                                      index: index,
+                                      knopText: index ==
+                                          gehaaldeDoelen.length + 1
+                                          ? 'Voltooien'
+                                          : (index < gehaaldeDoelen.length + 1
+                                          ? 'Voltooid'
+                                          : 'Standaard Knop'),
+                                      buttonText: 'Sluiten',
+                                      onButtonPressed: () {
+                                        setState(() {
+                                          Navigator.pushNamed(
+                                              context, '/levels');
+                                        });
+                                      },
+                                    );
+                                  },
+                                );
+                              }
+                              else if (index == gehaaldeDoelen.length + 1){
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Behaal eerst het volgende doel (onderste stappenteller)'),
+                                      backgroundColor: Colors.redAccent,
+                                    ));
+                              }
+                              else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Complete eerst het level hiervoor'),
+                                      backgroundColor: Colors.redAccent,
+                                    ));
+                              }
                             }
                           },
                           child: Text('$index',
@@ -682,10 +771,11 @@ void saveStappen() async {
 
 void loadStappen() async {
   final prefs = await SharedPreferences.getInstance();
-  await prefs.getInt('stappen');
+  totalSteps = prefs.getInt('stappen').toString();
 }
 
 void resetTotaal() async {
-  totalSteps = '0';
+  totalSteps = await (int.parse(totalSteps) - _volgenddoel).toString();
   saveStappen();
 }
+

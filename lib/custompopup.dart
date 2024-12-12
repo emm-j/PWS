@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:projecten/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'gedeeldelijsten.dart';
 
 class CustomPopup extends StatefulWidget {
@@ -28,6 +29,22 @@ class CustomPopup extends StatefulWidget {
 }
 
 class _CustomPopupState extends State<CustomPopup> {
+  void saveLijst() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('gehaald', gehaaldeDoelen);
+  }
+
+  void loadLijst() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      gehaaldeDoelen = prefs.getStringList('gehaald')!;
+    });
+  }
+
+  void resetLijst() async {
+    gehaaldeDoelen = [];
+    saveLijst();
+  }
   late String currentKnopText;
   late int currentIndex;
 
@@ -70,19 +87,21 @@ class _CustomPopupState extends State<CustomPopup> {
                color: Colors.grey[800],
              ),
              ),
-             TextButton(onPressed: () {
+             TextButton(onPressed: () async {
                if (widget.index == gehaaldeDoelen.length + 1) {
-                 gehaaldeDoelen.add(widget.index);
+                 gehaaldeDoelen.add((widget.index).toString());
                  setState(() {
                    currentKnopText = 'Voltooid';
                    achtergrondkleur = Colors.green[100];
                    resetTotaal();
+                   saveLijst();
                  });
                }
                else if (widget.index <= gehaaldeDoelen.length) {
                  print('Al voltooid');
+                 resetLijst();
                }
-             }, child: Text('$currentKnopText'))
+               }, child: Text('$currentKnopText'))
            ],
          ),
       ),
