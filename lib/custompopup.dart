@@ -99,7 +99,6 @@ class _CustomPopupState extends State<CustomPopup> {
                }
                else if (widget.index <= gehaaldeDoelen.length) {
                  print('Al voltooid');
-                 resetLijst();
                }
                }, child: Text('$currentKnopText'))
            ],

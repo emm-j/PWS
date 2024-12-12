@@ -9,7 +9,7 @@ import 'gedeeldelijsten.dart';
 var mainGroen = Color.fromRGBO(151, 200, 130, 1);
 var mainOranje = Color.fromRGBO(255, 204, 111, 1);
 int _doelstappen = 0;
-int _volgenddoel = 500;
+int _volgenddoel = 50000;
 String _doelstappenMetPunt = '0';
 String _volgenddoelMetPunt = '0';
 String _doelstappenweergeven = '0';
