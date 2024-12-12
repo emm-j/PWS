@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:projecten/main.dart';
 import 'gedeeldelijsten.dart';
 
 class CustomPopup extends StatefulWidget {
@@ -75,13 +76,11 @@ class _CustomPopupState extends State<CustomPopup> {
                  setState(() {
                    currentKnopText = 'Voltooid';
                    achtergrondkleur = Colors.green[100];
+                   resetTotaal();
                  });
                }
-               else if (widget.index < gehaaldeDoelen.length) {
-
-               }
-               else {
-                 print('niks');
+               else if (widget.index <= gehaaldeDoelen.length) {
+                 print('Al voltooid');
                }
              }, child: Text('$currentKnopText'))
            ],

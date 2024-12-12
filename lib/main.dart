@@ -14,6 +14,7 @@ String _doelstappenMetPunt = '0';
 String _volgenddoelMetPunt = '100.000';
 String _doelstappenweergeven = '0';
 String _volgenddoelweergeven = '0';
+String totalSteps = '0';
 String _steps = '1';
 String userInput = '0';
 bool magDoor = false;
@@ -56,7 +57,6 @@ class _HomePageState extends State<HomePage> {
   late int dagelijksestappen = int.parse(_steps);
   double dagelijksevoortgang = 0.0;
   double voortgangsindsdoel = 0.0;
-
   void checkAndResetSteps() async {
     final prefs = await SharedPreferences.getInstance();
     String? lastResetDate =
@@ -90,23 +90,37 @@ class _HomePageState extends State<HomePage> {
     _stepOffset = prefs.getInt('stepOffset') ?? 0;
   }
 
-  @override
+
+ @override
   void initState() {
     super.initState();
     initPlatformState();
     checkAndResetSteps();
     loadOffset();
+    loadStappen();
     haalInvoerop();
   }
 
+  double previousAcceleration = 0.0; // Houd de vorige acceleratie bij
+
+  double lowPassFilter(double input, double previousOutput, double alpha) {
+    return alpha * input + (1 - alpha) * previousOutput;
+  }
   void onStepCount(StepCount event) async {
     checkAndResetSteps();
+    if (int.parse(_steps) <= 0) {
+      _stepOffset = 0;
+      saveOffset();
+    }
     print(event);
     print("Offset: $_stepOffset");
     setState(() {
       int rawSteps = event.steps;
+      totalSteps = (int.parse(totalSteps) - int.parse(_steps)).toString();
       _steps = (rawSteps - _stepOffset).toString();
+      totalSteps = (int.parse(_steps) + int.parse(totalSteps)).toString();
     });
+    saveStappen();
     _hogeredagelijksevoortgang();
     _hogerevoortgangsindsdoel();
     didChangeDependencies();
@@ -282,7 +296,7 @@ class _HomePageState extends State<HomePage> {
                 const EdgeInsetsDirectional.fromSTEB(30, 30, 30, 0),
                 child: Center(
                   child: Text(
-                    (int.parse(_steps) + _stepOffset).toString(),
+                    '$totalSteps',
                     style: const TextStyle(
                         fontSize: 65.0,
                         fontFamily: 'Tekst',
@@ -558,8 +572,7 @@ class _LevelsState extends State<Levels> {
                                     buttonText: 'Sluiten',
                                     onButtonPressed: () {
                                         setState(() {
-                                          gehaaldeDoelen.add(index);
-                                          gehaaldeDoelen.remove(index);
+                                          Navigator.pushNamed(context, '/levels');
                                         });
                                     },
                                   );
@@ -661,4 +674,18 @@ void haalInvoerop() async {
 void slaInvoerop() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setInt('invoer', _doelstappen);
+}
+void saveStappen() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setInt('stappen', int.parse(totalSteps));
+}
+
+void loadStappen() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.getInt('stappen');
+}
+
+void resetTotaal() async {
+  totalSteps = '0';
+  saveStappen();
 }
