@@ -109,8 +109,6 @@ class _HomePageState extends State<HomePage> {
       _stepOffset = 0;
       saveOffset();
     }
-    print(event);
-    print("Offset: $_stepOffset");
     setState(() {
       int rawSteps = event.steps;
       totalSteps = (int.parse(totalSteps) - int.parse(_steps)).toString();
@@ -765,12 +763,13 @@ void slaInvoerop() async {
 }
 void saveStappen() async {
   final prefs = await SharedPreferences.getInstance();
-  await prefs.setInt('stappen', int.parse(totalSteps));
+  await prefs.setString('stappen', totalSteps);
 }
 
 void loadStappen() async {
   final prefs = await SharedPreferences.getInstance();
-  totalSteps = prefs.getInt('stappen').toString();
+  String? opgehaald = prefs.getString('stappen');
+  totalSteps = opgehaald ?? '0';
 }
 
 void resetTotaal() async {
