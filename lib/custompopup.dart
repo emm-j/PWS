@@ -54,6 +54,36 @@ class _CustomPopupState extends State<CustomPopup> {
     currentIndex = widget.index;
   }
 
+  String getChallenge() {
+    List Challenges = ['test',"Het is gelukt",
+      "Loop 1500 stappen binnen 20 minuten.",
+      "Loop 2000 stappen binnen 25 minuten.",
+      "Loop 2500 stappen binnen 30 minuten.",
+      "Loop 3000 stappen binnen 35 minuten.",
+      "Loop 3500 stappen binnen 40 minuten.",
+      "Loop 4000 stappen binnen 45 minuten.",
+      "Loop 4500 stappen binnen 50 minuten.",
+      "Loop 5000 stappen binnen 55 minuten.",
+      "Loop 5500 stappen binnen 60 minuten.",
+      "Loop 6000 stappen binnen 65 minuten.",
+      "Loop 7000 stappen binnen 75 minuten.",
+      "Loop 8000 stappen binnen 85 minuten.",
+      "Loop 10000 stappen binnen 100 minuten.",
+      "Loop 12000 stappen binnen 120 minuten.",
+      "Loop 13000 stappen binnen 130 minuten.",
+      "Loop 14000 stappen binnen 140 minuten.",
+      "Loop 15000 stappen binnen 150 minuten.",
+      "Loop 20000 stappen binnen 120 minuten.",
+      "Loop 42.195 km binnen 5 uur (300 minuten)."];
+    if (currentIndex <= gehaaldeDoelen.length + 1) {
+      return Challenges[currentIndex];
+    }
+    if (currentIndex > gehaaldeDoelen.length + 1) {
+      return '';
+    }
+    return 'Something went wrong!';
+  }
+
   @override
   Widget build(BuildContext context) {
     var achtergrondkleur = currentIndex == gehaaldeDoelen.length + 1
@@ -87,6 +117,7 @@ class _CustomPopupState extends State<CustomPopup> {
                color: Colors.grey[800],
              ),
              ),
+             Text(getChallenge()),
              TextButton(onPressed: () async {
                if (widget.index == gehaaldeDoelen.length + 1) {
                  gehaaldeDoelen.add((widget.index).toString());

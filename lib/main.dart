@@ -14,13 +14,12 @@ String _doelstappenMetPunt = '0';
 String _volgenddoelMetPunt = '0';
 String _doelstappenweergeven = '0';
 String _volgenddoelweergeven = '0';
-String totalSteps = '50';
-String _steps = '1';
+String totalSteps = '0';
+String _steps = '0';
 String userInput = '0';
 bool magDoor = false;
 int _stepOffset = 0;
 List levels = [];
-int rawSteps = 3;
 
 void main() {
   runApp(const MyApp());
@@ -77,7 +76,6 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _stepOffset = int.parse(_steps) + _stepOffset;
       _steps = '0';
-      dagelijksevoortgang = 0.0;
     });
     saveOffset(); // Sla de nieuwe offset op
   }
@@ -112,7 +110,7 @@ class _HomePageState extends State<HomePage> {
       saveOffset();
     }
     setState(() {
-      rawSteps = event.steps;
+      int rawSteps = event.steps;
       totalSteps = (int.parse(totalSteps) - int.parse(_steps)).toString();
       _steps = (rawSteps - _stepOffset).toString();
       totalSteps = (int.parse(_steps) + int.parse(totalSteps)).toString();
@@ -145,6 +143,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _hogeredagelijksevoortgang() {
+    print(_doelstappen);
     if (_doelstappen == 0) {
       setState(() {
         dagelijksevoortgang = 0.0; // Voortgang kan niet worden berekend
@@ -152,6 +151,7 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     dagelijksevoortgang = int.parse(_steps) / _doelstappen;
+    print(dagelijksevoortgang);
 
     setState(() {
       if (dagelijksevoortgang <= 0.25) {
@@ -181,6 +181,7 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     voortgangsindsdoel = int.parse(totalSteps) / _volgenddoel;
+    print(voortgangsindsdoel);
 
     setState(() {
       if (voortgangsindsdoel <= 0.25) {
@@ -477,6 +478,7 @@ class _SettingsState extends State<Settings> {
                     height: 60,
                     child: IconButton(
                       onPressed: () {
+                        print(_doelstappen);
                         if (_doelstappen >= 1000 && _doelstappen <= 50000) {
                           _doelstappenMetPunt = getalMetPunt(_doelstappen.toString());
                           Navigator.pushNamed(context, '/');
@@ -761,12 +763,11 @@ void slaInvoerop() async {
 }
 void saveStappen() async {
   final prefs = await SharedPreferences.getInstance();
-  await prefs.setInt('stappen', int.parse(totalSteps));
+  await prefs.setString('stappen', totalSteps);
 }
-
 void loadStappen() async {
   final prefs = await SharedPreferences.getInstance();
-  String? opgehaald = prefs.getInt('stappen').toString();
+  String? opgehaald = prefs.getString('stappen');
   totalSteps = opgehaald ?? '0';
 }
 
