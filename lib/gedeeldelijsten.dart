@@ -1,3 +1,4 @@
 import 'package:flutter/material.dart';
 
-List<String> gehaaldeDoelen = [];
+List<String> gehaaldeChallenge = [];
+List<String> isdoelgehaald = ['test'];

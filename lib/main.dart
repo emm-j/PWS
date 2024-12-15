@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:projecten/gedeeldelijsten.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -521,22 +522,22 @@ class Levels extends StatefulWidget {
 class _LevelsState extends State<Levels> {
   void saveLijst() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('gehaald', gehaaldeDoelen);
+    await prefs.setStringList('gehaald', gehaaldeChallenge);
   }
 
   void loadLijst() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      gehaaldeDoelen = prefs.getStringList('gehaald')!;
+      gehaaldeChallenge = prefs.getStringList('gehaald')!;
     });
   }
 
   void resetLijst() async {
-    gehaaldeDoelen = [];
+    gehaaldeChallenge = [];
     saveLijst();
   }
   List levelgetal = ['test','1','2','3', '4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20'];
-  List leveltext = ['test',"Loop 1000 stappen binnen 15 minuten.",
+  List leveltext = ['test',"Loop 50",
     "Loop 1500 stappen binnen 20 minuten.",
     "Loop 2000 stappen binnen 25 minuten.",
     "Loop 2500 stappen binnen 30 minuten.",
@@ -582,19 +583,18 @@ class _LevelsState extends State<Levels> {
                         height: 100,
                         width: 100,
                         decoration: BoxDecoration(
-                          color: index == gehaaldeDoelen.length + 1 && int.parse(totalSteps) >= _volgenddoel
+                          color: index == gehaaldeChallenge.length + 1
                               ? mainOranje
-                              : (index < gehaaldeDoelen.length + 1
+                              : (index < gehaaldeChallenge.length + 1
                               ? mainGroen
-                              : index == gehaaldeDoelen.length + 1 && int.parse(totalSteps) < _volgenddoel
+                              : index == gehaaldeChallenge.length + 1 && int.parse(totalSteps) < _volgenddoel
                               ? Color.fromRGBO(255, 56, 112, 0.8)
                               : Color.fromRGBO(255, 56, 112, 0.8)),
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: TextButton(
                           onPressed: () {
-                            if (int.parse(totalSteps) >= _volgenddoel) {
-                              if (index <= gehaaldeDoelen.length + 1) {
+                              if (index <= gehaaldeChallenge.length + 1) {
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
@@ -603,9 +603,9 @@ class _LevelsState extends State<Levels> {
                                       content: leveltext[index],
                                       index: index,
                                       knopText: index ==
-                                          gehaaldeDoelen.length + 1
+                                          gehaaldeChallenge.length + 1
                                           ? 'Voltooien'
-                                          : (index < gehaaldeDoelen.length + 1
+                                          : (index < gehaaldeChallenge.length + 1
                                           ? 'Voltooid'
                                           : 'Standaard Knop'),
                                       buttonText: 'Sluiten',
@@ -623,55 +623,11 @@ class _LevelsState extends State<Levels> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text(
-                                          'Complete eerst het level hiervoor'),
+                                          'Voltooi eerst het level hiervoor'),
                                       backgroundColor: Colors.redAccent,
                                     ));
                               }
-                            }
-                            else {
-                              if (index < gehaaldeDoelen.length + 1) {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return CustomPopup(
-                                      title: levelgetal[index],
-                                      content: leveltext[index],
-                                      index: index,
-                                      knopText: index ==
-                                          gehaaldeDoelen.length + 1
-                                          ? 'Voltooien'
-                                          : (index < gehaaldeDoelen.length + 1
-                                          ? 'Voltooid'
-                                          : 'Standaard Knop'),
-                                      buttonText: 'Sluiten',
-                                      onButtonPressed: () {
-                                        setState(() {
-                                          Navigator.pushNamed(
-                                              context, '/levels');
-                                        });
-                                      },
-                                    );
-                                  },
-                                );
-                              }
-                              else if (index == gehaaldeDoelen.length + 1){
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                          'Behaal eerst het volgende doel (onderste stappenteller)'),
-                                      backgroundColor: Colors.redAccent,
-                                    ));
-                              }
-                              else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                          'Complete eerst het level hiervoor'),
-                                      backgroundColor: Colors.redAccent,
-                                    ));
-                              }
-                            }
-                          },
+                            },
                           child: Text('$index',
                           style: TextStyle(
                             fontFamily: "Tekst",

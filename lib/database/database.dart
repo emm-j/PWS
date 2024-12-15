@@ -1,6 +1,9 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:projecten/database/database_service.dart';
 import 'package:projecten/data_model/models.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:projecten/database/database_service.dart';
+import 'package:projecten/data_model/models.dart';
 
 class Doelen {
   final tabelNaam = 'doelen';

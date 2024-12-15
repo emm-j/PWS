@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:projecten/gedeeldelijsten.dart';
 import 'package:projecten/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'gedeeldelijsten.dart';
@@ -31,18 +32,18 @@ class CustomPopup extends StatefulWidget {
 class _CustomPopupState extends State<CustomPopup> {
   void saveLijst() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('gehaald', gehaaldeDoelen);
+    await prefs.setStringList('gehaald', gehaaldeChallenge);
   }
 
   void loadLijst() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      gehaaldeDoelen = prefs.getStringList('gehaald')!;
+      gehaaldeChallenge = prefs.getStringList('gehaald')!;
     });
   }
 
   void resetLijst() async {
-    gehaaldeDoelen = [];
+    gehaaldeChallenge = [];
     saveLijst();
   }
   late String currentKnopText;
@@ -75,10 +76,10 @@ class _CustomPopupState extends State<CustomPopup> {
       "Loop 15000 stappen binnen 150 minuten.",
       "Loop 20000 stappen binnen 120 minuten.",
       "Loop 42.195 km binnen 5 uur (300 minuten)."];
-    if (currentIndex <= gehaaldeDoelen.length + 1) {
+    if (currentIndex <= gehaaldeChallenge.length + 1) {
       return Challenges[currentIndex];
     }
-    if (currentIndex > gehaaldeDoelen.length + 1) {
+    if (currentIndex > gehaaldeChallenge.length + 1) {
       return '';
     }
     return 'Something went wrong!';
@@ -86,9 +87,9 @@ class _CustomPopupState extends State<CustomPopup> {
 
   @override
   Widget build(BuildContext context) {
-    var achtergrondkleur = currentIndex == gehaaldeDoelen.length + 1
+    var achtergrondkleur = currentIndex == gehaaldeChallenge.length + 1
         ? Colors.amber[100]
-        : (currentIndex < gehaaldeDoelen.length + 1
+        : (currentIndex < gehaaldeChallenge.length + 1
         ? Colors.green[100]
         : Colors.red[100]);
     return AlertDialog(
@@ -117,10 +118,16 @@ class _CustomPopupState extends State<CustomPopup> {
                color: Colors.grey[800],
              ),
              ),
-             Text(getChallenge()),
+             Text(getChallenge(),
+               style: TextStyle(
+                 fontFamily: "Tekst",
+                 fontSize: 15,
+                 fontWeight: FontWeight.w400,
+                 color: Colors.grey[800],
+               ),),
              TextButton(onPressed: () async {
-               if (widget.index == gehaaldeDoelen.length + 1) {
-                 gehaaldeDoelen.add((widget.index).toString());
+               if (widget.index == gehaaldeChallenge.length + 1) {
+                 gehaaldeChallenge.add((widget.index).toString());
                  setState(() {
                    currentKnopText = 'Voltooid';
                    achtergrondkleur = Colors.green[100];
@@ -128,10 +135,24 @@ class _CustomPopupState extends State<CustomPopup> {
                    saveLijst();
                  });
                }
-               else if (widget.index <= gehaaldeDoelen.length) {
+               else if (widget.index <= gehaaldeChallenge.length) {
                  print('Al voltooid');
                }
-               }, child: Text('$currentKnopText'))
+               }, child: Container(
+                 padding: EdgeInsetsDirectional.fromSTEB(10,10,10,10),
+                 margin: EdgeInsetsDirectional.fromSTEB(0, 30, 0, 30),
+                 decoration: BoxDecoration(
+                   borderRadius: BorderRadius.all(Radius.circular(15))
+                 ),
+                 child: Text('$currentKnopText',
+                 style: TextStyle(
+                   decoration: TextDecoration.underline,
+                 fontFamily: "Tekst",
+                 fontSize: 20,
+                 fontWeight: FontWeight.w600,
+                 color: Colors.grey[800],
+                              ),),
+               ))
            ],
          ),
       ),
