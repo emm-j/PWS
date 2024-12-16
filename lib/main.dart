@@ -105,7 +105,7 @@ class _HomePageState extends State<HomePage> {
   void onStepCount(StepCount event) async {
     checkAndResetSteps();
     loadStappen();
-    if (doelgehaald = false && int.parse(totalSteps) >= _volgenddoel) {
+    if (doelgehaald == false && int.parse(totalSteps) >= _volgenddoel) {
       doelgehaald = true;
       isdoelgehaald.add('gehaald');
     }
@@ -346,7 +346,7 @@ class _HomePageState extends State<HomePage> {
               print(isdoelgehaald);
               print(gehaaldeChallenge);
               print(doelgehaald);
-              if (doelgehaald = false && int.parse(totalSteps) >= _volgenddoel) {
+              if (doelgehaald == false && int.parse(totalSteps) >= _volgenddoel) {
                   print('jippie');
                   doelgehaald = true;
                   isdoelgehaald.add('gehaald');
@@ -596,7 +596,7 @@ class _LevelsState extends State<Levels> {
                         height: 100,
                         width: 100,
                         decoration: BoxDecoration(
-                          color: index == gehaaldeChallenge.length + 1
+                          color: index == gehaaldeChallenge.length + 1 && int.parse(totalSteps) >= _volgenddoel
                               ? mainOranje
                               : (index < gehaaldeChallenge.length + 1
                               ? mainGroen
@@ -622,6 +622,8 @@ class _LevelsState extends State<Levels> {
                                           ? 'Voltooid'
                                           : 'Standaard Knop'),
                                       buttonText: 'Sluiten',
+                                      challengeSteps: _steps,
+                                      tijd: DateTime.now().toString(),
                                       onButtonPressed: () {
                                         setState(() {
                                           Navigator.pushNamed(

@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:projecten/gedeeldelijsten.dart';
 import 'package:projecten/main.dart';
@@ -11,6 +9,8 @@ class CustomPopup extends StatefulWidget {
   final String buttonText;
   final int index;
   final String knopText;
+  final String challengeSteps;
+  final String tijd;
 
   final VoidCallback? onButtonPressed;
 
@@ -22,6 +22,8 @@ class CustomPopup extends StatefulWidget {
     required this.knopText,
     this.buttonText = 'OK',
     this.onButtonPressed,
+    required this.challengeSteps,
+    required this.tijd,
   }) : super(key: key);
 
   @override
@@ -55,7 +57,8 @@ class _CustomPopupState extends State<CustomPopup> {
   }
 
   String getChallenge() {
-    List Challenges = ['test',"Het is gelukt",
+    List Challenges = ["Het is gelukt",
+      "Loop 1000 stappen binnen 15 minuten",
       "Loop 1500 stappen binnen 20 minuten.",
       "Loop 2000 stappen binnen 25 minuten.",
       "Loop 2500 stappen binnen 30 minuten.",
@@ -137,6 +140,7 @@ class _CustomPopupState extends State<CustomPopup> {
                }
                else if (widget.index <= gehaaldeChallenge.length) {
                  print('Al voltooid');
+                 resetLijst();
                }
                }, child: Container(
                  padding: EdgeInsetsDirectional.fromSTEB(10,10,10,10),
