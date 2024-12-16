@@ -163,8 +163,7 @@ class _CustomPopupState extends State<CustomPopup> {
                               ),),
                )
     ),
-             IconButton(onPressed: () {print(currentIndex);print(isdoelgehaald.length);print(doelgehaald);}, icon: Icon(Icons.access_alarm_rounded)),
-             IconButton(onPressed: () {resetLijst(); totalSteps = '0'; saveStappen();}, icon: Icon(Icons.ac_unit_rounded))
+
            ],
          ),
       ),

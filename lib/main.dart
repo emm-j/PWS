@@ -9,9 +9,9 @@ import 'custompopup.dart';
 var mainGroen = Color.fromRGBO(151, 200, 130, 1);
 var mainOranje = Color.fromRGBO(255, 204, 111, 1);
 int _doelstappen = 0;
-int _volgenddoel = 50000;
+List _volgenddoel = [50000,10000,15000,20000,30000,50000];
 String _doelstappenMetPunt = '0';
-String _volgenddoelMetPunt = '0';
+List _volgenddoelMetPunt = ['5.000','10.000','20.000','30.000','50.000'];
 String _doelstappenweergeven = '0';
 String _volgenddoelweergeven = '0';
 String totalSteps = '0';
@@ -105,7 +105,7 @@ class _HomePageState extends State<HomePage> {
   void onStepCount(StepCount event) async {
     checkAndResetSteps();
     loadStappen();
-    if (doelgehaald == false && int.parse(totalSteps) >= _volgenddoel) {
+    if (doelgehaald == false && int.parse(totalSteps) >= _volgenddoel[isdoelgehaald.length-1]) {
       doelgehaald = true;
       isdoelgehaald.add('gehaald');
       saveLijst();
@@ -116,6 +116,7 @@ class _HomePageState extends State<HomePage> {
       saveOffset();
     }
     setState(() {
+      _volgenddoelweergeven = _volgenddoelMetPunt[isdoelgehaald.length-1];
       int rawSteps = event.steps;
       totalSteps = (int.parse(totalSteps) - int.parse(_steps)).toString();
       _steps = (rawSteps - _stepOffset).toString();
@@ -184,7 +185,7 @@ class _HomePageState extends State<HomePage> {
       });
       return;
     }
-    voortgangsindsdoel = int.parse(totalSteps) / _volgenddoel;
+    voortgangsindsdoel = int.parse(totalSteps) / _volgenddoel[isdoelgehaald.length-1];
 
     setState(() {
       if (voortgangsindsdoel <= 0.25) {
@@ -212,8 +213,7 @@ class _HomePageState extends State<HomePage> {
   }
   void _updateVolgenddoel() {
     setState(() {
-      _volgenddoelMetPunt = getalMetPunt(_volgenddoel.toString());
-      _volgenddoelweergeven = _volgenddoelMetPunt;
+      _volgenddoelweergeven = _volgenddoelMetPunt[isdoelgehaald.length-1];
     });
   }
   @override
@@ -346,7 +346,7 @@ class _HomePageState extends State<HomePage> {
               saveStappen();
               didChangeDependencies();
               totalSteps = (int.parse(totalSteps) + 10000).toString();
-              if (doelgehaald == false && int.parse(totalSteps) >= _volgenddoel) {
+              if (doelgehaald == false && int.parse(totalSteps) >= _volgenddoel[isdoelgehaald.length-1]) {
                   print('jippie');
                   isdoelgehaald.add('gehaald');
                   saveLijst();
@@ -585,7 +585,6 @@ class _LevelsState extends State<Levels> {
             SizedBox(
               height: 50
             ),
-            IconButton(onPressed: () {print(totalSteps);print(isdoelgehaald);print(gehaaldeChallenge);print(doelgehaald);}, icon: Icon(Icons.add)),
             Column(
               children: [
                 for (int i = 1; i < 8; i++)
@@ -602,7 +601,7 @@ class _LevelsState extends State<Levels> {
                               ? mainOranje
                               : (index < gehaaldeChallenge.length + 1
                               ? mainGroen
-                              : index == gehaaldeChallenge.length + 1 && int.parse(totalSteps) < _volgenddoel
+                              : index == gehaaldeChallenge.length + 1 && int.parse(totalSteps) < _volgenddoel[isdoelgehaald.length-1]
                               ? Color.fromRGBO(255, 56, 112, 0.8)
                               : Color.fromRGBO(255, 56, 112, 0.8)),
                           borderRadius: BorderRadius.circular(15),
@@ -745,7 +744,7 @@ void loadStappen() async {
 }
 
 void resetTotaal() async {
-  totalSteps = await (int.parse(totalSteps) - _volgenddoel).toString();
+  totalSteps = await (int.parse(totalSteps) - _volgenddoel[isdoelgehaald.length-1]).toString();
   saveStappen();
 }
 
