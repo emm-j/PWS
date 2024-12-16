@@ -92,11 +92,10 @@ class _CustomPopupState extends State<CustomPopup> {
 
   @override
   Widget build(BuildContext context) {
-    var achtergrondkleur = currentIndex == gehaaldeChallenge.length + 1
-        ? Colors.amber[100]
-        : (currentIndex < gehaaldeChallenge.length + 1
+    var achtergrondkleur =
+        (currentIndex < gehaaldeChallenge.length + 1
         ? Colors.green[100]
-        : Colors.red[100]);
+        : Colors.amber[100]);
     return AlertDialog(
       backgroundColor: achtergrondkleur,
       title: Center(
@@ -123,6 +122,7 @@ class _CustomPopupState extends State<CustomPopup> {
                color: Colors.grey[800],
              ),
              ),
+             Padding(padding: EdgeInsetsDirectional.fromSTEB(0, 30, 0, 30)),
              Text(getChallenge(),
                style: TextStyle(
                  fontFamily: "Tekst",

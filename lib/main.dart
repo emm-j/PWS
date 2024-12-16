@@ -9,9 +9,9 @@ import 'custompopup.dart';
 var mainGroen = Color.fromRGBO(151, 200, 130, 1);
 var mainOranje = Color.fromRGBO(255, 204, 111, 1);
 int _doelstappen = 0;
-List _volgenddoel = [50000,10000,15000,20000,30000,50000];
+List _volgenddoel = [100,250,500,1000,2500,5000,7500,10000,15000,20000,25000,30000,35000,40000,45000,50000,60000,70000,80000,100000];
 String _doelstappenMetPunt = '0';
-List _volgenddoelMetPunt = ['5.000','10.000','20.000','30.000','50.000'];
+List _volgenddoelMetPunt = ['100','250','500','1.000','2.500','5.000','7.500', '10.000', '15.000', '20.000', '25.000''30.000','40.000','45.000','50.000', '60.000', '70.000', '80.000', '100.000'];
 String _doelstappenweergeven = '0';
 String _volgenddoelweergeven = '0';
 String totalSteps = '0';
@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       routes: {
         '/': (context) => const HomePage(),
         '/settings': (context) => const Settings(),
@@ -227,6 +228,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(80),
           child: AppBar(
@@ -551,26 +553,27 @@ class _LevelsState extends State<Levels> {
     saveLijst();
   }
   List levelgetal = ['test','1','2','3', '4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20'];
-  List leveltext = ['test',"Loop 50",
-    "Loop 1500 stappen binnen 20 minuten.",
-    "Loop 2000 stappen binnen 25 minuten.",
-    "Loop 2500 stappen binnen 30 minuten.",
-    "Loop 3000 stappen binnen 35 minuten.",
-    "Loop 3500 stappen binnen 40 minuten.",
-    "Loop 4000 stappen binnen 45 minuten.",
-    "Loop 4500 stappen binnen 50 minuten.",
-    "Loop 5000 stappen binnen 55 minuten.",
-    "Loop 5500 stappen binnen 60 minuten.",
-    "Loop 6000 stappen binnen 65 minuten.",
-    "Loop 7000 stappen binnen 75 minuten.",
-    "Loop 8000 stappen binnen 85 minuten.",
-    "Loop 10000 stappen binnen 100 minuten.",
-    "Loop 12000 stappen binnen 120 minuten.",
-    "Loop 13000 stappen binnen 130 minuten.",
-    "Loop 14000 stappen binnen 140 minuten.",
-    "Loop 15000 stappen binnen 150 minuten.",
-    "Loop 20000 stappen binnen 120 minuten.",
-    "Loop 42.195 km binnen 5 uur (300 minuten)."];
+  List leveltext = ['test',
+    "Loop 100 stappen om de challenge te ontgrendelen",
+    "Loop 250 stappen om de challenge te ontgrendelen",
+    "Loop 500 stappen om de challenge te ontgrendelen",
+    "Loop 1.000 stappen om de challenge te ontgrendelen",
+    "Loop 2.500 stappen om de challenge te ontgrendelen",
+    "Loop 5.000 stappen om de challenge te ontgrendelen",
+    "Loop 10.000 stappen om de challenge te ontgrendelen",
+    "Loop 15.000 stappen om de challenge te ontgrendelen",
+    "Loop 20.000 stappen om de challenge te ontgrendelen",
+    "Loop 25.000 stappen om de challenge te ontgrendelen",
+    "Loop 30.000 stappen om de challenge te ontgrendelen",
+    "Loop 35.000 stappen om de challenge te ontgrendelen",
+    "Loop 40.000 stappen om de challenge te ontgrendelen",
+    "Loop 45.000 stappen om de challenge te ontgrendelen",
+    "Loop 50.000 stappen om de challenge te ontgrendelen",
+    "Loop 60.000 stappen om de challenge te ontgrendelen",
+    "Loop 70.000 stappen om de challenge te ontgrendelen",
+    "Loop 80.000 stappen om de challenge te ontgrendelen",
+    "Loop 100.000 stappen om de challenge te ontgrendelen",
+    ];
   @override
   void initState() {
     super.initState();
@@ -597,18 +600,20 @@ class _LevelsState extends State<Levels> {
                         height: 100,
                         width: 100,
                         decoration: BoxDecoration(
-                          color: index == gehaaldeChallenge.length + 1
-                              ? mainOranje
-                              : (index < gehaaldeChallenge.length + 1
+                          color: (index < gehaaldeChallenge.length + 1
                               ? mainGroen
-                              : index == gehaaldeChallenge.length + 1 && int.parse(totalSteps) < _volgenddoel[isdoelgehaald.length-1]
+                                  :
+                              index <= isdoelgehaald.length
+                              ? mainOranje
+                                  :
+                              index == gehaaldeChallenge.length + 1 && int.parse(totalSteps) < _volgenddoel[isdoelgehaald.length-1]
                               ? Color.fromRGBO(255, 56, 112, 0.8)
                               : Color.fromRGBO(255, 56, 112, 0.8)),
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: TextButton(
                           onPressed: () {
-                              if (index <= gehaaldeChallenge.length + 1) {
+                              if (index <= isdoelgehaald.length) {
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
@@ -616,12 +621,15 @@ class _LevelsState extends State<Levels> {
                                       title: levelgetal[index],
                                       content: leveltext[index],
                                       index: index,
-                                      knopText: index ==
+                                      knopText: index > isdoelgehaald.length
+                                        ? ''
+                                              :
+                                          index ==
                                           gehaaldeChallenge.length + 1
                                           ? 'Voltooien'
                                           : (index < gehaaldeChallenge.length + 1
                                           ? 'Voltooid'
-                                          : 'Standaard Knop'),
+                                          : 'Voltooi eerst het vorige level'),
                                       buttonText: 'Sluiten',
                                       challengeSteps: _steps,
                                       tijd: DateTime.now().toString(),
