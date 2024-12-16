@@ -592,7 +592,7 @@ class _LevelsState extends State<Levels> {
                         height: 100,
                         width: 100,
                         decoration: BoxDecoration(
-                          color: index == gehaaldeChallenge.length + 1 && int.parse(totalSteps) >= _volgenddoel
+                          color: index == gehaaldeChallenge.length + 1
                               ? mainOranje
                               : (index < gehaaldeChallenge.length + 1
                               ? mainGroen
