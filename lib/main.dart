@@ -108,6 +108,8 @@ class _HomePageState extends State<HomePage> {
     if (doelgehaald == false && int.parse(totalSteps) >= _volgenddoel) {
       doelgehaald = true;
       isdoelgehaald.add('gehaald');
+      saveLijst();
+      print(isdoelgehaald);
     }
     if (int.parse(_steps) <= 0) {
       _stepOffset = 0;
@@ -339,13 +341,17 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.w800))
               ],
             ),
-            IconButton(onPressed: () {totalSteps = (int.parse(totalSteps) + 10000).toString();
+            IconButton(onPressed: () {
+              totalSteps = (int.parse(totalSteps) + 10000).toString();
+              saveStappen();
               didChangeDependencies();
               totalSteps = (int.parse(totalSteps) + 10000).toString();
               if (doelgehaald == false && int.parse(totalSteps) >= _volgenddoel) {
                   print('jippie');
-                  doelgehaald = true;
                   isdoelgehaald.add('gehaald');
+                  saveLijst();
+                  print(isdoelgehaald);
+                  doelgehaald = true;
               }
               },
     icon: Icon(Icons.add)),
@@ -529,20 +535,19 @@ class Levels extends StatefulWidget {
 }
 
 class _LevelsState extends State<Levels> {
-  void saveLijst() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('gehaald', gehaaldeChallenge);
-  }
 
   void loadLijst() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       gehaaldeChallenge = prefs.getStringList('gehaald')!;
+      isdoelgehaald = prefs.getStringList('doelen')!;
+      print(isdoelgehaald);
     });
   }
 
   void resetLijst() async {
     gehaaldeChallenge = [];
+    isdoelgehaald = ['test'];
     saveLijst();
   }
   List levelgetal = ['test','1','2','3', '4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20'];
@@ -580,6 +585,7 @@ class _LevelsState extends State<Levels> {
             SizedBox(
               height: 50
             ),
+            IconButton(onPressed: () {print(totalSteps);print(isdoelgehaald);print(gehaaldeChallenge);print(doelgehaald);}, icon: Icon(Icons.add)),
             Column(
               children: [
                 for (int i = 1; i < 8; i++)
@@ -741,5 +747,11 @@ void loadStappen() async {
 void resetTotaal() async {
   totalSteps = await (int.parse(totalSteps) - _volgenddoel).toString();
   saveStappen();
+}
+
+void saveLijst() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setStringList('gehaald', gehaaldeChallenge);
+  await prefs.setStringList('doelen', isdoelgehaald);
 }
 

@@ -34,17 +34,20 @@ class _CustomPopupState extends State<CustomPopup> {
   void saveLijst() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList('gehaald', gehaaldeChallenge);
+    await prefs.setStringList('doelen', isdoelgehaald);
   }
 
   void loadLijst() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       gehaaldeChallenge = prefs.getStringList('gehaald')!;
+      isdoelgehaald = prefs.getStringList('doelen')!;
     });
   }
 
   void resetLijst() async {
     gehaaldeChallenge = [];
+    isdoelgehaald = ['test'];
     saveLijst();
   }
   late String currentKnopText;
@@ -78,10 +81,10 @@ class _CustomPopupState extends State<CustomPopup> {
       "Loop 15000 stappen binnen 150 minuten.",
       "Loop 20000 stappen binnen 120 minuten.",
       "Loop 42.195 km binnen 5 uur (300 minuten)."];
-    if (currentIndex <= isdoelgehaald.length) {
+    if (currentIndex < isdoelgehaald.length) {
       return Challenges[currentIndex];
     }
-    if (currentIndex > isdoelgehaald.length) {
+    if (currentIndex >= isdoelgehaald.length) {
       return '';
     }
     return 'Something went wrong!';
@@ -128,7 +131,7 @@ class _CustomPopupState extends State<CustomPopup> {
                  color: Colors.grey[800],
                ),),
              TextButton(onPressed: () async {
-               if (currentIndex <= isdoelgehaald.length) {
+               if (currentIndex < isdoelgehaald.length) {
                  if (widget.index == gehaaldeChallenge.length + 1) {
                    gehaaldeChallenge.add((widget.index).toString());
                    doelgehaald = false;
@@ -159,7 +162,9 @@ class _CustomPopupState extends State<CustomPopup> {
                  color: Colors.grey[800],
                               ),),
                )
-    )
+    ),
+             IconButton(onPressed: () {print(currentIndex);print(isdoelgehaald.length);print(doelgehaald);}, icon: Icon(Icons.access_alarm_rounded)),
+             IconButton(onPressed: () {resetLijst(); totalSteps = '0'; saveStappen();}, icon: Icon(Icons.ac_unit_rounded))
            ],
          ),
       ),
