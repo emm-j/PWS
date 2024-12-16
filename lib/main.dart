@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'custompopup.dart';
-import 'gedeeldelijsten.dart';
 
 var mainGroen = Color.fromRGBO(151, 200, 130, 1);
 var mainOranje = Color.fromRGBO(255, 204, 111, 1);
@@ -62,7 +61,7 @@ class _HomePageState extends State<HomePage> {
   void checkAndResetSteps() async {
     final prefs = await SharedPreferences.getInstance();
     String? lastResetDate =
-        prefs.getString('lastResetDate'); // Ophalen van opgeslagen datum
+        prefs.getString('lastResetDate');
 
     String todayDate =
         DateFormat('yyyy-MM-dd').format(DateTime.now()); // Huidige datum
@@ -106,6 +105,10 @@ class _HomePageState extends State<HomePage> {
   void onStepCount(StepCount event) async {
     checkAndResetSteps();
     loadStappen();
+    if (doelgehaald = false && int.parse(totalSteps) >= _volgenddoel) {
+      doelgehaald = true;
+      isdoelgehaald.add('gehaald');
+    }
     if (int.parse(_steps) <= 0) {
       _stepOffset = 0;
       saveOffset();
@@ -144,7 +147,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _hogeredagelijksevoortgang() {
-    print(_doelstappen);
     if (_doelstappen == 0) {
       setState(() {
         dagelijksevoortgang = 0.0; // Voortgang kan niet worden berekend
@@ -152,7 +154,6 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     dagelijksevoortgang = int.parse(_steps) / _doelstappen;
-    print(dagelijksevoortgang);
 
     setState(() {
       if (dagelijksevoortgang <= 0.25) {
@@ -182,7 +183,6 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     voortgangsindsdoel = int.parse(totalSteps) / _volgenddoel;
-    print(voortgangsindsdoel);
 
     setState(() {
       if (voortgangsindsdoel <= 0.25) {
@@ -339,6 +339,20 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.w800))
               ],
             ),
+            IconButton(onPressed: () {totalSteps = (int.parse(totalSteps) + 10000).toString();
+              didChangeDependencies();
+              print(totalSteps);
+              print(_volgenddoel);
+              print(isdoelgehaald);
+              print(gehaaldeChallenge);
+              print(doelgehaald);
+              if (doelgehaald = false && int.parse(totalSteps) >= _volgenddoel) {
+                  print('jippie');
+                  doelgehaald = true;
+                  isdoelgehaald.add('gehaald');
+              }
+              },
+    icon: Icon(Icons.add)),
             Spacer(),
             Container(
               height: 80,
@@ -479,7 +493,6 @@ class _SettingsState extends State<Settings> {
                     height: 60,
                     child: IconButton(
                       onPressed: () {
-                        print(_doelstappen);
                         if (_doelstappen >= 1000 && _doelstappen <= 50000) {
                           _doelstappenMetPunt = getalMetPunt(_doelstappen.toString());
                           Navigator.pushNamed(context, '/');

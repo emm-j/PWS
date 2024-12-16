@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:projecten/gedeeldelijsten.dart';
 import 'package:projecten/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'gedeeldelijsten.dart';
 
 class CustomPopup extends StatefulWidget {
   final String title;
@@ -76,10 +75,10 @@ class _CustomPopupState extends State<CustomPopup> {
       "Loop 15000 stappen binnen 150 minuten.",
       "Loop 20000 stappen binnen 120 minuten.",
       "Loop 42.195 km binnen 5 uur (300 minuten)."];
-    if (currentIndex <= gehaaldeChallenge.length + 1) {
+    if (currentIndex <= isdoelgehaald.length) {
       return Challenges[currentIndex];
     }
-    if (currentIndex > gehaaldeChallenge.length + 1) {
+    if (currentIndex > isdoelgehaald.length) {
       return '';
     }
     return 'Something went wrong!';
@@ -128,6 +127,7 @@ class _CustomPopupState extends State<CustomPopup> {
              TextButton(onPressed: () async {
                if (widget.index == gehaaldeChallenge.length + 1) {
                  gehaaldeChallenge.add((widget.index).toString());
+                 doelgehaald = false;
                  setState(() {
                    currentKnopText = 'Voltooid';
                    achtergrondkleur = Colors.green[100];
