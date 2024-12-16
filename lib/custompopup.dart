@@ -128,21 +128,23 @@ class _CustomPopupState extends State<CustomPopup> {
                  color: Colors.grey[800],
                ),),
              TextButton(onPressed: () async {
-               if (widget.index == gehaaldeChallenge.length + 1) {
-                 gehaaldeChallenge.add((widget.index).toString());
-                 doelgehaald = false;
-                 setState(() {
-                   currentKnopText = 'Voltooid';
-                   achtergrondkleur = Colors.green[100];
-                   resetTotaal();
-                   saveLijst();
-                 });
+               if (currentIndex <= isdoelgehaald.length) {
+                 if (widget.index == gehaaldeChallenge.length + 1) {
+                   gehaaldeChallenge.add((widget.index).toString());
+                   doelgehaald = false;
+                   setState(() {
+                     currentKnopText = 'Voltooid';
+                     achtergrondkleur = Colors.green[100];
+                     resetTotaal();
+                     saveLijst();
+                   });
+                 }
+                 else if (widget.index <= gehaaldeChallenge.length) {
+                   print('Al voltooid');
+                 }
                }
-               else if (widget.index <= gehaaldeChallenge.length) {
-                 print('Al voltooid');
-                 resetLijst();
-               }
-               }, child: Container(
+             },
+                  child: Container(
                  padding: EdgeInsetsDirectional.fromSTEB(10,10,10,10),
                  margin: EdgeInsetsDirectional.fromSTEB(0, 30, 0, 30),
                  decoration: BoxDecoration(
@@ -156,7 +158,8 @@ class _CustomPopupState extends State<CustomPopup> {
                  fontWeight: FontWeight.w600,
                  color: Colors.grey[800],
                               ),),
-               ))
+               )
+    )
            ],
          ),
       ),

@@ -341,11 +341,7 @@ class _HomePageState extends State<HomePage> {
             ),
             IconButton(onPressed: () {totalSteps = (int.parse(totalSteps) + 10000).toString();
               didChangeDependencies();
-              print(totalSteps);
-              print(_volgenddoel);
-              print(isdoelgehaald);
-              print(gehaaldeChallenge);
-              print(doelgehaald);
+              totalSteps = (int.parse(totalSteps) + 10000).toString();
               if (doelgehaald == false && int.parse(totalSteps) >= _volgenddoel) {
                   print('jippie');
                   doelgehaald = true;
