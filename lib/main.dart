@@ -344,7 +344,6 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             IconButton(onPressed: () {
-              totalSteps = (int.parse(totalSteps) + 10000).toString();
               saveStappen();
               didChangeDependencies();
               totalSteps = (int.parse(totalSteps) + 10000).toString();
@@ -760,5 +759,11 @@ void saveLijst() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setStringList('gehaald', gehaaldeChallenge);
   await prefs.setStringList('doelen', isdoelgehaald);
+}
+
+void resetLijst() async {
+  gehaaldeChallenge = [];
+  isdoelgehaald = ['test'];
+  saveLijst();
 }
 

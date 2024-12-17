@@ -61,7 +61,9 @@ class _CustomPopupState extends State<CustomPopup> {
 
   String getChallenge() {
     List Challenges = ["Het is gelukt",
-      "Loop 1000 stappen binnen 15 minuten",
+      """
+      Doe 5 squads
+      Gelukt? Klik op voltooien""",
       "Loop 1500 stappen binnen 20 minuten.",
       "Loop 2000 stappen binnen 25 minuten.",
       "Loop 2500 stappen binnen 30 minuten.",
@@ -123,13 +125,15 @@ class _CustomPopupState extends State<CustomPopup> {
              ),
              ),
              Padding(padding: EdgeInsetsDirectional.fromSTEB(0, 30, 0, 30)),
-             Text(getChallenge(),
-               style: TextStyle(
-                 fontFamily: "Tekst",
-                 fontSize: 15,
-                 fontWeight: FontWeight.w400,
-                 color: Colors.grey[800],
-               ),),
+             Center(
+               child: Text(getChallenge(),
+                 style: TextStyle(
+                   fontFamily: "Tekst",
+                   fontSize: 15,
+                   fontWeight: FontWeight.w400,
+                   color: Colors.grey[800],
+                 ),),
+             ),
              TextButton(onPressed: () async {
                if (currentIndex < isdoelgehaald.length) {
                  if (widget.index == gehaaldeChallenge.length + 1) {
