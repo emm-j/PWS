@@ -13,7 +13,7 @@ var mainOranje = Color.fromRGBO(255, 204, 111, 1);
 int _doelstappen = 0;
 List _volgenddoel = [100,250,500,1000,2500,5000,7500,10000,15000,20000,25000,30000,35000,40000,45000,50000,60000,70000,80000,100000];
 String _doelstappenMetPunt = '0';
-List _volgenddoelMetPunt = ['100','250','500','1.000','2.500','5.000','7.500', '10.000', '15.000', '20.000', '25.000''30.000','40.000','45.000','50.000', '60.000', '70.000', '80.000', '100.000'];
+List _volgenddoelMetPunt = ['100','250','500','1.000','2.500','5.000','7.500', '10.000', '15.000', '20.000', '25.000','30.000','40.000','45.000','50.000', '60.000', '70.000', '80.000', '100.000'];
 String _doelstappenweergeven = '0';
 String _volgenddoelweergeven = '0';
 String totalSteps = '0';
@@ -62,11 +62,6 @@ class _HomePageState extends State<HomePage> {
   late int dagelijksestappen = int.parse(_steps);
   double dagelijksevoortgang = 0.0;
   double voortgangsindsdoel = 0.0;
-  Timer? _timer;
-
-  void update5seconden() {
-    weergeven = totalSteps;
-  }
   void checkAndResetSteps() async {
     final prefs = await SharedPreferences.getInstance();
     String? lastResetDate =
@@ -100,13 +95,28 @@ class _HomePageState extends State<HomePage> {
   }
   void loadStappen() async {
     final prefs = await SharedPreferences.getInstance();
-    String? opgehaald = prefs.getString('stappen');
     setState(() {
+      String? opgehaald = prefs.getString('stappen');
       totalSteps = opgehaald ?? '0';
     });
   }
-
-
+  void loadLijst() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      List<String> lijst1 = prefs.getStringList('gehaald')!;
+      List<String> lijst2 = prefs.getStringList('doelen')!;
+      gehaaldeChallenge = lijst1;
+      isdoelgehaald = lijst2;
+    });
+  }
+  void haalInvoerop() async {
+    final prefs = await SharedPreferences.getInstance();
+    int? waarde = prefs.getInt('invoer');
+    setState(() {
+      _doelstappen = waarde ?? 10000;
+      _doelstappenMetPunt = getalMetPunt(_doelstappen.toString());
+    });
+  }
  @override
   void initState() {
     super.initState();
@@ -115,21 +125,16 @@ class _HomePageState extends State<HomePage> {
     loadOffset();
     loadStappen();
     haalInvoerop();
-    _timer = Timer.periodic(Duration(seconds: 5), (Timer timer)
-    {
-      update5seconden();
-    });
+    loadLijst();
+    didChangeDependencies();
   }
 
-  @override
-  void dispose() {
-    // Zorg ervoor dat de timer wordt gestopt als de widget wordt vernietigd
-    _timer?.cancel();
-    super.dispose();
-  }
 
   void onStepCount(StepCount event) async {
     checkAndResetSteps();
+    if (int.parse(totalSteps) < _volgenddoel[isdoelgehaald.length-1]){
+      doelgehaald = false;
+    }
     if (doelgehaald == false && int.parse(totalSteps) >= _volgenddoel[isdoelgehaald.length-1]) {
       doelgehaald = true;
       isdoelgehaald.add('gehaald');
@@ -142,18 +147,22 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _volgenddoelweergeven = _volgenddoelMetPunt[isdoelgehaald.length-1];
       int rawSteps = event.steps;
-      print('Vooraf: $totalSteps en $_steps');
-      totalSteps = (int.parse(totalSteps) - int.parse(_steps)).toString();
-      print('Midden: $totalSteps en $_steps');
-      _steps = (rawSteps - _stepOffset).toString();
-      print('Midden 2: $totalSteps en $_steps');
-      totalSteps = (int.parse(_steps) + int.parse(totalSteps)).toString();
-      print('Achteraf: $totalSteps en $_steps');
+      if (_steps != '0') {
+        totalSteps = (int.parse(totalSteps) - int.parse(_steps)).toString();
+        _steps = (rawSteps - _stepOffset).toString();
+        totalSteps = (int.parse(_steps) + int.parse(totalSteps)).toString();
+      }
+      else {
+        _steps = (rawSteps - _stepOffset).toString();
+        totalSteps = (int.parse(totalSteps) - int.parse(_steps)).toString();
+        _steps = (rawSteps - _stepOffset).toString();
+        totalSteps = (int.parse(_steps) + int.parse(totalSteps)).toString();
+      }
     });
-    print(totalSteps);
     saveStappen(totalSteps);
     _hogeredagelijksevoortgang();
     _hogerevoortgangsindsdoel();
+    didChangeDependencies();
   }
   void onStepCountError(error) {
     setState(() {
@@ -560,14 +569,6 @@ class Levels extends StatefulWidget {
 
 class _LevelsState extends State<Levels> {
 
-  void loadLijst() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      gehaaldeChallenge = prefs.getStringList('gehaald')!;
-      isdoelgehaald = prefs.getStringList('doelen')!;
-    });
-  }
-
   void resetLijst() async {
     gehaaldeChallenge = [];
     isdoelgehaald = ['test'];
@@ -598,7 +599,6 @@ class _LevelsState extends State<Levels> {
   @override
   void initState() {
     super.initState();
-    loadLijst();
   }
   @override
   Widget build(BuildContext context) {
@@ -752,22 +752,14 @@ getalMetPunt(getal) {
 
   return _getalMetPunt;
 }
-void haalInvoerop() async {
-  final prefs = await SharedPreferences.getInstance();
-  int? waarde = prefs.getInt('invoer');
-  _doelstappen = waarde ?? 10000;
-  _doelstappenMetPunt = getalMetPunt(_doelstappen.toString());
-}
+
 void slaInvoerop() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setInt('invoer', _doelstappen);
 }
 void saveStappen(stappen) async {
   final prefs = await SharedPreferences.getInstance();
-  print(totalSteps);
   await prefs.setString('stappen', stappen);
-  String? opgeslagen = prefs.getString('stappen') ?? '0';
-  print(opgeslagen);
 }
 
 
