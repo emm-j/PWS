@@ -66,7 +66,6 @@ class _HomePageState extends State<HomePage> {
 
   void update5seconden() {
     weergeven = totalSteps;
-    didChangeDependencies();
   }
   void checkAndResetSteps() async {
     final prefs = await SharedPreferences.getInstance();
@@ -99,6 +98,13 @@ class _HomePageState extends State<HomePage> {
     final prefs = await SharedPreferences.getInstance();
     _stepOffset = prefs.getInt('stepOffset') ?? 0;
   }
+  void loadStappen() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? opgehaald = prefs.getString('stappen');
+    setState(() {
+      totalSteps = opgehaald ?? '0';
+    });
+  }
 
 
  @override
@@ -109,7 +115,6 @@ class _HomePageState extends State<HomePage> {
     loadOffset();
     loadStappen();
     haalInvoerop();
-    didChangeDependencies();
     _timer = Timer.periodic(Duration(seconds: 5), (Timer timer)
     {
       update5seconden();
@@ -125,12 +130,10 @@ class _HomePageState extends State<HomePage> {
 
   void onStepCount(StepCount event) async {
     checkAndResetSteps();
-    loadStappen();
     if (doelgehaald == false && int.parse(totalSteps) >= _volgenddoel[isdoelgehaald.length-1]) {
       doelgehaald = true;
       isdoelgehaald.add('gehaald');
       saveLijst();
-      print(isdoelgehaald);
     }
     if (int.parse(_steps) <= 0) {
       _stepOffset = 0;
@@ -139,14 +142,18 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _volgenddoelweergeven = _volgenddoelMetPunt[isdoelgehaald.length-1];
       int rawSteps = event.steps;
+      print('Vooraf: $totalSteps en $_steps');
       totalSteps = (int.parse(totalSteps) - int.parse(_steps)).toString();
+      print('Midden: $totalSteps en $_steps');
       _steps = (rawSteps - _stepOffset).toString();
+      print('Midden 2: $totalSteps en $_steps');
       totalSteps = (int.parse(_steps) + int.parse(totalSteps)).toString();
+      print('Achteraf: $totalSteps en $_steps');
     });
-    saveStappen();
+    print(totalSteps);
+    saveStappen(totalSteps);
     _hogeredagelijksevoortgang();
     _hogerevoortgangsindsdoel();
-    didChangeDependencies();
   }
   void onStepCountError(error) {
     setState(() {
@@ -364,14 +371,11 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             IconButton(onPressed: () {
-              saveStappen();
-              didChangeDependencies();
+              saveStappen(totalSteps);
               totalSteps = (int.parse(totalSteps) + 10000).toString();
               if (doelgehaald == false && int.parse(totalSteps) >= _volgenddoel[isdoelgehaald.length-1]) {
-                  print('jippie');
                   isdoelgehaald.add('gehaald');
                   saveLijst();
-                  print(isdoelgehaald);
                   doelgehaald = true;
               }
               },
@@ -519,7 +523,6 @@ class _SettingsState extends State<Settings> {
                         if (_doelstappen >= 1000 && _doelstappen <= 50000) {
                           _doelstappenMetPunt = getalMetPunt(_doelstappen.toString());
                           Navigator.pushNamed(context, '/');
-                          didChangeDependencies();
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                             content: Text('Sla je keuze op'),
@@ -562,7 +565,6 @@ class _LevelsState extends State<Levels> {
     setState(() {
       gehaaldeChallenge = prefs.getStringList('gehaald')!;
       isdoelgehaald = prefs.getStringList('doelen')!;
-      print(isdoelgehaald);
     });
   }
 
@@ -760,19 +762,18 @@ void slaInvoerop() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setInt('invoer', _doelstappen);
 }
-void saveStappen() async {
+void saveStappen(stappen) async {
   final prefs = await SharedPreferences.getInstance();
-  await prefs.setString('stappen', totalSteps);
+  print(totalSteps);
+  await prefs.setString('stappen', stappen);
+  String? opgeslagen = prefs.getString('stappen') ?? '0';
+  print(opgeslagen);
 }
-void loadStappen() async {
-  final prefs = await SharedPreferences.getInstance();
-  String? opgehaald = prefs.getString('stappen');
-  totalSteps = opgehaald ?? '0';
-}
+
 
 void resetTotaal() async {
   totalSteps = await (int.parse(totalSteps) - _volgenddoel[isdoelgehaald.length-1]).toString();
-  saveStappen();
+  saveStappen(totalSteps);
 }
 
 void saveLijst() async {
