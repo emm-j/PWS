@@ -139,6 +139,7 @@ class _CustomPopupState extends State<CustomPopup> {
                  if (widget.index == gehaaldeChallenge.length + 1) {
                    gehaaldeChallenge.add((widget.index).toString());
                    doelgehaald = false;
+                   print(totalSteps);
                    setState(() {
                      currentKnopText = 'Voltooid';
                      achtergrondkleur = Colors.green[100];

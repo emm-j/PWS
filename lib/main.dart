@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:projecten/gedeeldelijsten.dart';
@@ -20,6 +22,7 @@ String userInput = '0';
 bool magDoor = false;
 int _stepOffset = 0;
 List levels = [];
+String weergeven = '0';
 
 void main() {
   runApp(const MyApp());
@@ -59,6 +62,12 @@ class _HomePageState extends State<HomePage> {
   late int dagelijksestappen = int.parse(_steps);
   double dagelijksevoortgang = 0.0;
   double voortgangsindsdoel = 0.0;
+  Timer? _timer;
+
+  void update5seconden() {
+    weergeven = totalSteps;
+    didChangeDependencies();
+  }
   void checkAndResetSteps() async {
     final prefs = await SharedPreferences.getInstance();
     String? lastResetDate =
@@ -101,6 +110,17 @@ class _HomePageState extends State<HomePage> {
     loadStappen();
     haalInvoerop();
     didChangeDependencies();
+    _timer = Timer.periodic(Duration(seconds: 5), (Timer timer)
+    {
+      update5seconden();
+    });
+  }
+
+  @override
+  void dispose() {
+    // Zorg ervoor dat de timer wordt gestopt als de widget wordt vernietigd
+    _timer?.cancel();
+    super.dispose();
   }
 
   void onStepCount(StepCount event) async {
@@ -296,7 +316,7 @@ class _HomePageState extends State<HomePage> {
                 const EdgeInsetsDirectional.fromSTEB(30, 30, 30, 0),
                 child: Center(
                   child: Text(
-                    '$totalSteps',
+                    totalSteps,
                     style: const TextStyle(
                         fontSize: 65.0,
                         fontFamily: 'Tekst',
